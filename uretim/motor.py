@@ -369,7 +369,8 @@ def _mp3_np(path):
 
 
 def seslendir(metin, dil="tr"):
-    ses, hiz, perde = SESLER[dil]
+    ses, hiz, perde, *ek = SESLER[dil]
+    hizlandir = ek[0] if ek else 1.0  # >1: sesi örnekleyerek hızlandırır ve inceltir (çizgi film sesi, doğal tını korunur)
     anahtar = hashlib.md5(f"{ses}|{hiz}|{perde}|{metin}".encode()).hexdigest()[:16]
     yol = ONBELLEK / f"{anahtar}.mp3"
     if not yol.exists() or yol.stat().st_size < 1000:
@@ -389,6 +390,9 @@ def seslendir(metin, dil="tr"):
     idx = np.where(np.abs(s) > 0.015)[0]
     if len(idx):
         s = s[max(0, idx[0] - 600): idx[-1] + 2500]
+    if hizlandir != 1.0:
+        n = int(len(s) / hizlandir)
+        s = np.interp(np.linspace(0, len(s) - 1, n), np.arange(len(s)), s).astype(np.float32)
     return s
 
 
@@ -509,18 +513,22 @@ class Ses:
         self.efektler = []
         self.agizlar = []  # Boncuk'un dudak hareketi için (t, zarf)
 
-    def konus(self, t, metin, dil="tr", boncuk_mu=True):
+    def konus(self, t, metin, dil="tr", boncuk_mu=True, kim=None):
+        """kim: ağzı bu konuşmayla oynayacak karakter (varsayılan Boncuk; hikâyelerde pamuk/minik da olur)."""
         s = seslendir(metin, dil)
         self.konusma.append((t, s))
-        if boncuk_mu:
-            self.agizlar.append((t, zarf(s)))
+        kim = kim or ("boncuk" if boncuk_mu else None)
+        if kim:
+            self.agizlar.append((t, zarf(s), kim))
         return len(s) / SR
 
     def efekt(self, t, ad, kazanc=1.0):
         self.efektler.append((t, efekt(ad) * kazanc))
 
-    def agiz(self, t):
-        for st, e in self.agizlar:
+    def agiz(self, t, kim="boncuk"):
+        for st, e, k in self.agizlar:
+            if k != kim:
+                continue
             i = int((t - st) * FPS)
             if 0 <= i < len(e):
                 return float(e[i])
