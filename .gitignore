@@ -13,3 +13,12 @@ veri/dashboard/
 veri/boncuk_otomasyon_sayfasi.html
 *.wav
 *.mp4
+
+# Kanal istatistikleri sadece bulut önbelleğinde (en fazla 30 gün) tutulur, git'e girmez
+veri/gecmis.json
+veri/rapor.json
+site/rapor/rapor.json
+site/veri/videolar.json
+
+# Denetim formu kanıt dosyaları (sadece bilgisayarda)
+denetim/

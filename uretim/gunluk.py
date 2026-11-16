@@ -27,7 +27,8 @@ VIDEOLAR = PROJE / "videolar"
 SITE = PROJE / "site"
 AYARLAR = VERI / "ayarlar.json"
 ESLEME = VERI / "yuklemeler.json"   # bölüm no -> YouTube video id
-GECMIS = VERI / "gecmis.json"       # günlük kanal anlık görüntüleri
+GECMIS = VERI / "gecmis.json"       # günlük kanal anlık görüntüleri (YouTube kuralı: en fazla 30 gün saklanır)
+SAKLAMA_GUN = 30
 BOLUMLER = VERI / "bolumler.json"   # bölüm içerikleri (uret.py yazar)
 RAPOR = VERI / "rapor.json"
 LOG = VERI / "gunluk.log"
@@ -207,7 +208,10 @@ def calistir(yukleme_yok=False):
     vid_bol = {vid: int(no) for no, vid in esleme.items()}
     if kanal:
         gecmis[bugun] = {"abone": kanal["abone"], "izlenme": sum(v["izlenme"] for v in videolar) or kanal["izlenme"], "video": len(videolar)}
-        yaz(GECMIS, gecmis)
+    # YouTube API kuralı: istatistikler 30 günden uzun saklanmaz, eskiler silinir
+    sinir = (simdi.date() - dt.timedelta(days=SAKLAMA_GUN)).isoformat()
+    gecmis = {g: v for g, v in gecmis.items() if g >= sinir}
+    yaz(GECMIS, gecmis)
     gunler = sorted(gecmis)
     gunluk = []
     for i, g in enumerate(gunler):
@@ -271,7 +275,7 @@ def calistir(yukleme_yok=False):
         "toplam_izlenme": son_toplam,
         "dun_izlenme": gunluk[-1]["gunluk_izlenme"] if gunluk and gunluk[-1]["gunluk_izlenme"] is not None else 0,
         "son7_izlenme": son_toplam - toplam_once(7),
-        "son90_izlenme": son_toplam - toplam_once(90),
+        "son30_izlenme": son_toplam - toplam_once(30),
         "yayinda": sum(r["durum"] == "Yayında" for r in video_satirlari),
         "planli": len(planli),
         "hazir_bekleyen": len(bekleyen),

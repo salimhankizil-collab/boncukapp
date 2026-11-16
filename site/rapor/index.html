@@ -50,7 +50,7 @@
   <section>
     <h2>Para kazanma hedefi</h2>
     <div class="hedefler" id="hedefler"></div>
-    <p class="meta">Shorts ile para kazanmak için iki hedefin ikisi de gerekir. 90 günlük izlenme, raporların başladığı günden bu yana biriken sayılardan hesaplanır.</p>
+    <p class="meta">Shorts ile para kazanmak için 1.000 abone ve 90 günde 10 milyon izlenme gerekir. YouTube kuralları gereği istatistikleri en fazla 30 gün saklıyoruz; bu yüzden izlenme çubuğu son 30 günü 90 günlük hedefin üçte biriyle karşılaştırır. Resmi 90 günlük sayı YouTube Studio → Para kazan sayfasında görünür.</p>
   </section>
   <section><h2>Günlük izlenme</h2><div class="grafik kart" id="grafik"></div></section>
   <section><h2>Hangi tür daha çok izleniyor?</h2><div class="kart" id="turler"></div></section>
@@ -90,7 +90,7 @@
     const c = el('div', 'cubuk'); const i = el('i'); i.style.width = Math.max(yuzde, deger > 0 ? 1 : 0) + '%'; c.append(i); k.append(c);
     return k;
   };
-  document.getElementById('hedefler').replaceChildren(hedef('Abone', o.abone, HEDEF_ABONE), hedef('Son 90 gün izlenme', o.son90_izlenme, HEDEF_IZLENME));
+  document.getElementById('hedefler').replaceChildren(hedef('Abone', o.abone, HEDEF_ABONE), hedef('Son 30 gün izlenme', o.son30_izlenme ?? 0, Math.round(HEDEF_IZLENME / 3)));
 
   const gunler = r.gunluk.filter((g) => g.gunluk_izlenme !== null && g.gunluk_izlenme !== undefined);
   const grafik = document.getElementById('grafik');

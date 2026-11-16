@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boncuk Otomasyon · Boncuk Çocuk TV</title>
+<meta name="description" content="Boncuk Otomasyon: Boncuk Çocuk TV kanalının YouTube API Hizmetlerini kullanan yardımcı uygulaması">
+<meta name="theme-color" content="#2680f0">
+<meta name="sw" content="sw.js">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="ortak.css">
+<style>
+  .metin { max-width: 46rem; }
+  .metin h1 { font-size: clamp(2rem, 6vw, 2.8rem); margin-bottom: 4px; }
+  .metin h2 { font-size: 1.5rem; margin: 28px 0 8px; }
+  .metin h3 { font-size: 1.15rem; margin: 18px 0 4px; }
+  .metin p, .metin ul { margin: 0 0 10px; }
+  .metin section + section { border-top: 2px dashed var(--cizgi); margin-top: 32px; padding-top: 8px; }
+  .sema { width: 100%; height: auto; border-radius: 16px; box-shadow: var(--golge); background: #fff; }
+  .yt-not { padding: 14px 18px; }
+  .yt { color: #e00; font-weight: 800; }
+  .metin ol { margin: 0 0 10px; padding-left: 1.4em; }
+</style>
+</head>
+<body>
+<div class="serit"></div>
+<header class="ust">
+  <div class="kap">
+    <a class="logo" href="./"><img src="img/boncuk.png" alt="">Boncuk</a>
+    <nav class="menu" aria-label="Ana menü">
+      <a href="./">Ana sayfa</a>
+      <a href="./#oyunlar">Oyunlar</a>
+      <a href="videolar.html">Videolar</a>
+    </nav>
+  </div>
+</header>
+<main class="kap bolum metin">
+  <section lang="en">
+    <h1>Boncuk Otomasyon</h1>
+    <p class="soluk">Channel helper app for the <a href="https://www.youtube.com/@BoncukCocukTV" target="_blank" rel="noopener">Boncuk Çocuk TV</a> YouTube channel · <a href="#tr">Türkçe</a></p>
+    <p class="kart yt-not"><strong>Uses <span class="yt">YouTube</span> API Services.</strong> By using Boncuk Otomasyon you agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a>. See the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>, our <a href="gizlilik.html#privacy">Privacy Policy</a> and our <a href="kullanim-sartlari.html#terms">Terms of Use</a>.</p>
+
+    <h2>What it does</h2>
+    <p>Boncuk Otomasyon is a single-user tool used only by the owner of the Boncuk Çocuk TV channel. It is not offered to other users. Once a day it runs on GitHub Actions and:</p>
+    <ol>
+      <li>prepares the owner's own original kids' videos (Turkish and English colour and animal lessons);</li>
+      <li>uploads the next video to the owner's own channel as <em>made for kids</em> and schedules it for 18:00 Turkey time (<code>videos.insert</code>);</li>
+      <li>reads the channel's subscriber count, video list and per-video view and like counts (<code>channels.list</code>, <code>playlistItems.list</code>, <code>videos.list</code>);</li>
+      <li>publishes a short <a href="rapor/">daily report</a> for the owner and lists the channel's public videos on the <a href="videolar.html">videos page</a>.</li>
+    </ol>
+    <p>It never reads viewers' personal data, comments, messages or subscriber lists, never changes other channels and never shows ads. Channel statistics are kept for at most 30 days.</p>
+
+    <h2 id="architecture">Architecture</h2>
+    <img class="sema" src="img/mimari.png" alt="Architecture: GitHub Actions runs the daily job, which uses the owner's OAuth token from GitHub Secrets to call YouTube Data API v3 and publishes the report and website to GitHub Pages.">
+    <h2 id="user-flow">User flow</h2>
+    <img class="sema" src="img/akis.png" alt="User flow: the owner signs in once with Google and grants youtube.upload and youtube.readonly; every day the job uploads and schedules a video and the owner reads the report.">
+
+    <h2>Source code and access</h2>
+    <ul>
+      <li>Full source code: <a href="https://github.com/salimhankizil-collab/boncukapp" target="_blank" rel="noopener">github.com/salimhankizil-collab/boncukapp</a> (API calls in <code>uretim/youtube_api.py</code>, daily job in <code>uretim/gunluk.py</code>).</li>
+      <li>Live output: <a href="rapor/">daily report</a> · <a href="videolar.html">videos page</a>.</li>
+      <li>Revoke access at any time: <a href="https://security.google.com/settings/security/permissions" target="_blank" rel="noopener">Google security settings</a>.</li>
+      <li>Contact: <a href="https://github.com/salimhankizil-collab/boncukapp/issues" target="_blank" rel="noopener">GitHub issues</a>.</li>
+    </ul>
+  </section>
+  <section id="tr" lang="tr">
+    <h2>Türkçe özet</h2>
+    <p>Boncuk Otomasyon, Boncuk Çocuk TV kanalının sahibinin kendi kullandığı bir yardımcı programdır ve YouTube API Hizmetlerini kullanır. Her gün kanal sahibinin kendi videosunu kendi kanalına "çocuklara özel" olarak yükleyip 18:00'e planlar, kanal istatistiklerini okuyup <a href="rapor/">günlük rapor</a> hazırlar. İzleyici verisi okunmaz, istatistikler en fazla 30 gün saklanır. Ayrıntılar: <a href="gizlilik.html">Gizlilik politikası</a> · <a href="kullanim-sartlari.html">Kullanım şartları</a>.</p>
+  </section>
+</main>
+<footer class="alt">
+  <div class="kap"><span>© 2026 Boncuk Çocuk TV</span><span><a href="./">Ana sayfa</a> · <a href="gizlilik.html">Gizlilik politikası</a> · <a href="kullanim-sartlari.html">Kullanım şartları</a> · <a href="otomasyon.html">Boncuk Otomasyon</a></span></div>
+</footer>
+<script src="ortak.js"></script>
+</body>
+</html>

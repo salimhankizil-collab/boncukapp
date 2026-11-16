@@ -42,6 +42,19 @@ jobs:
           key: tts-${{ github.run_id }}
           restore-keys: tts-
 
+      # Kanal istatistikleri git geçmişine yazılmaz (YouTube kuralı: en fazla 30 gün saklanır).
+      # Günden güne sadece bu önbellekte taşınır; gunluk.py 30 günden eskileri siler.
+      - name: İstatistik ve rapor önbelleği
+        uses: actions/cache@v4
+        with:
+          path: |
+            veri/gecmis.json
+            veri/rapor.json
+            site/rapor/rapor.json
+            site/veri/videolar.json
+          key: istatistik-${{ github.run_id }}
+          restore-keys: istatistik-
+
       - name: Gizli anahtarları yerleştir
         if: github.event_name != 'push'
         env:
@@ -63,8 +76,8 @@ jobs:
         run: |
           git config user.name "boncuk-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add veri/*.json uretim/durum.json site/veri site/rapor
-          git diff --cached --quiet || git commit -m "Günlük rapor $(date -u +%F)"
+          git add veri/ayarlar.json veri/yuklemeler.json veri/bolumler.json uretim/durum.json
+          git diff --cached --quiet || git commit -m "Günlük durum $(date -u +%F)"
           git pull --rebase --autostash
           git push
 
