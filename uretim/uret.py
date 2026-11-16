@@ -143,13 +143,41 @@ def bilgileri_yenile():
         print("yenilendi:", klasor.name)
 
 
+def yeniden_uret(bas, son):
+    """Daha önce üretilmiş bölümleri (ör. motor güncellenince, henüz yüklenmemiş olanları) aynı içerikle yeniden üretir.
+    Hayvan seçimi sırası bozulmasın diye 1. bölümden itibaren sahneler sırayla kurulur, sadece [bas, son] videoya dökülür."""
+    durum = {"bolum": 0, "kullanilan_hayvanlar": []}
+    for no in range(1, son + 1):
+        tur = SIRA[(no - 1) % len(SIRA)]
+        rng = np.random.default_rng(1000 + no)
+        ses = motor.Ses()
+        if tur == "toplar":
+            sahne = motor.Toplar(rng, ses)
+        elif tur == "kule":
+            sahne = motor.Kule(rng, ses)
+        else:
+            sahne = motor.Golge(rng, ses, hayvan_sec(rng, durum))
+        if no < bas:
+            continue
+        klasor = CIKTI / f"Bolum_{no:03d}_{tur}"
+        klasor.mkdir(parents=True, exist_ok=True)
+        print(f"Bölüm {no} ({tur}) yeniden üretiliyor, süre {sahne.T:.1f} sn ...", flush=True)
+        motor.video_yap(sahne, ses, 1000 + no, klasor / f"Bolum_{no:03d}.mp4")
+        bilgi_yaz(klasor, tur, no, sahne)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--adet", type=int, default=1)
     ap.add_argument("--tur", choices=SIRA)
     ap.add_argument("--onizleme", action="store_true", help="yarım çözünürlük, sayaç ilerlemez")
     ap.add_argument("--bilgi-yenile", action="store_true", help="sadece yukleme_bilgisi.txt dosyalarını yeniden yaz")
+    ap.add_argument("--yeniden", metavar="BAS-SON", help="bu aralıktaki bölümleri yeniden üret, ör. 6-10")
     a = ap.parse_args()
+    if a.yeniden:
+        bas, son = (int(x) for x in a.yeniden.split("-"))
+        yeniden_uret(bas, son)
+        raise SystemExit
     if a.bilgi_yenile:
         bilgileri_yenile()
         raise SystemExit

@@ -318,7 +318,7 @@ class BoncukDurum:
             renk = tuple((v // 24) * 24 for v in renk_lerp(a, b, ease_in_out(i % 1)))
         acik_ag = self.ses.agiz(t)
         agiz = 0 if acik_ag < 0.12 else (1 if acik_ag < 0.4 else (2 if acik_ag < 0.7 else 3))
-        kirp = (t % 3.4) < 0.13
+        kirp = ((t + 1.5) % 3.4) < 0.13  # ilk karede (videonun kapağı) gözler açık
         sp = boncuk(renk, kirp, agiz)
         giris = ease_out_back((t - self.giris) / 0.5)
         hop = 0.0
@@ -599,6 +599,18 @@ class Konfeti:
             d.polygon(pts, fill=c)
 
 
+def soru_isaretleri(tv, t, noktalar, alfa=1.0):
+    """Açılış kancası: ekranda zıplayan turuncu soru işaretleri."""
+    if alfa <= 0:
+        return
+    for i, (qx, qy) in enumerate(noktalar):
+        g = ease_out_back(clamp((t - 0.08 * i) / 0.35))
+        if g <= 0:
+            continue
+        yapistir(tv, yazi_sprite("?", 120, (255, 140, 30), (255, 255, 255), 12), qx, qy + 15 * math.sin(t * 4 + i),
+                 g * (0.9 + 0.1 * math.sin(t * 6 + i)), alfa)
+
+
 # ---------------------------------------------------------------- sahneler
 class Sahne:
     baslik = ""
@@ -625,11 +637,9 @@ class Sahne:
 class Toplar(Sahne):
     baslik = "Renkleri Öğrenelim!"
     alt_baslik = "Let's learn colors!"
-    GIRISLER = [
-        "Merhaba, ben Boncuk! Hadi topları renklerine göre bardaklara koyalım!",
-        "Merhaba arkadaşım! Renkli toplar bardaklarını arıyor. Bana yardım eder misin?",
-        "Merhaba, ben Boncuk! Bugün renkli toplarla oynuyoruz. Hazır mısın?",
-    ]
+    # Shorts'ta izleyici ilk 1-2 saniyede kaydırır: uzun selamlama yerine ilk top hemen belirir
+    # ve Boncuk kısa bir soru sorar (kanca), ardından rengi söyler.
+    KANCALAR = ["Bu top hangi renk?", "Hangi renk bu?", "Bil bakalım, bu hangi renk?"]
     CIKISLAR = [
         "Yaşasın! Bütün toplar bardağına ulaştı! Sen en çok hangi rengi seviyorsun?",
         "Harika! Bütün renkleri birlikte bulduk! Yarın yeni bir oyunda görüşelim!",
@@ -650,17 +660,17 @@ class Toplar(Sahne):
         self.bg = self.bg.convert("RGB")
         self.boncuk = BoncukDurum(ses, 490, 935)
         self.baslangic = (490, 470)
+        self.boncuk.giris = -0.25  # 0. karede Boncuk zaten zıplayarak geliyor
 
-        t = 0.2
-        ses.efekt(t, "pop")
-        t = 0.6
-        t += ses.konus(t, rng.choice(self.GIRISLER)) + 0.35
+        kanca = str(rng.choice(self.KANCALAR))
+        t = 0.0
         self.toplar = []
         for k, (ad, ing, renk) in enumerate(self.top_sira):
             j = self.bardak_sira.index((ad, ing, renk))
-            o = {"renk": renk, "ad": ad, "ing": ing, "j": j, "dogum": t}
-            ses.efekt(t, "pop")
-            o["tr"] = t + 0.35
+            o = {"renk": renk, "ad": ad, "ing": ing, "j": j, "dogum": t - 0.3 if k == 0 else t}  # ilk top 0. karede görünür
+            ses.efekt(t + 0.03, "pop")
+            o["tr"] = (0.2 + ses.konus(0.2, kanca) + 0.12) if k == 0 else t + 0.35
+            o["kanca"] = k == 0
             self.boncuk.renk_degistir(o["tr"], renk)
             d1 = ses.konus(o["tr"], ad + "!")
             o["en"] = o["tr"] + d1 + 0.12
@@ -729,6 +739,9 @@ class Toplar(Sahne):
             yapistir(tv, on, cx, cy)
         for o, x, y, s in disarda:
             yapistir(tv, kure(o["renk"], 55), x, y, s)
+        ilk = self.toplar[0]
+        if t < ilk["tr"] + 0.2:
+            soru_isaretleri(tv, t, [(250, 430), (735, 400), (300, 640), (690, 650)], 1 - clamp((t - ilk["tr"]) / 0.2))
         for o in self.toplar:
             self.kelime_ciz(tv, tr_buyuk(o["ad"]), o["renk"], 490, 1025, t, o["tr"], o["ziplama"], 120)
             self.kelime_ciz(tv, o["ing"], KOYU_YAZI, 490, 1138, t, o["en"], o["ziplama"], 76)
@@ -740,10 +753,7 @@ class Toplar(Sahne):
 class Kule(Sahne):
     baslik = "Renkli Kule!"
     alt_baslik = "Build a rainbow tower!"
-    GIRISLER = [
-        "Merhaba, ben Boncuk! Hadi renkli bloklarla kocaman bir kule yapalım!",
-        "Merhaba arkadaşım! Bugün gökkuşağı kulesi yapıyoruz. Hazır mısın?",
-    ]
+    KANCALAR = ["Kule yapalım!", "Hangi renk geliyor?"]  # ilk 2 saniye: hemen aksiyon
 
     def __init__(self, rng, ses):
         super().__init__(rng, ses)
@@ -756,15 +766,14 @@ class Kule(Sahne):
         self.kx, self.taban = 370, 1450
         self.bh = 120
         self.boncuk = BoncukDurum(ses, 780, 1480, 0.78)
-        t = 0.2
-        ses.efekt(t, "pop")
-        t = 0.6
-        t += ses.konus(t, rng.choice(self.GIRISLER)) + 0.35
+        self.boncuk.giris = -0.25
+        kanca = str(rng.choice(self.KANCALAR))
+        t = 0.0
         self.bloklar = []
         for k, (ad, ing, renk) in enumerate(self.renkler):
-            b = {"renk": renk, "ad": ad, "ing": ing, "k": k, "dogum": t}
-            ses.efekt(t, "pop")
-            b["tr"] = t + 0.3
+            b = {"renk": renk, "ad": ad, "ing": ing, "k": k, "dogum": t - 0.3 if k == 0 else t}  # ilk blok 0. karede görünür
+            ses.efekt(t + 0.03, "pop")
+            b["tr"] = (0.2 + ses.konus(0.2, kanca) + 0.12) if k == 0 else t + 0.3
             self.boncuk.renk_degistir(b["tr"], renk)
             d1 = ses.konus(b["tr"], ad + "!")
             b["en"] = b["tr"] + d1 + 0.12
@@ -859,6 +868,9 @@ class Kule(Sahne):
                 x = self.kx + dx * math.cos(r) + dy * math.sin(r)
                 y = self.taban - dx * math.sin(r) + dy * math.cos(r)
             yapistir(tv, sp, x, y, s, 1.0, egim)
+        ilk = self.bloklar[0]
+        if t < ilk["tr"] + 0.2:
+            soru_isaretleri(tv, t, [(170, 430), (600, 470), (190, 760), (560, 800)], 1 - clamp((t - ilk["tr"]) / 0.2))
         for b in self.bloklar:
             self.kelime_ciz(tv, tr_buyuk(b["ad"]), b["renk"], 740, 560, t, b["tr"], b["dusus"], 104)
             self.kelime_ciz(tv, b["ing"], KOYU_YAZI, 740, 676, t, b["en"], b["dusus"], 76)
@@ -885,10 +897,6 @@ def hayvan_sprite(kod, boyut, golge=False):
 class Golge(Sahne):
     baslik = "Bu Kimin Gölgesi?"
     alt_baslik = "Guess the animal!"
-    GIRISLER = [
-        "Merhaba, ben Boncuk! Gölgelere bak, hangi hayvan olduğunu tahmin et!",
-        "Merhaba arkadaşım! Işıkları kapattım, gölgeler geldi! Bil bakalım bunlar kim?",
-    ]
 
     def __init__(self, rng, ses, hayvanlar):
         super().__init__(rng, ses)
@@ -900,15 +908,14 @@ class Golge(Sahne):
         self.baslik_ciz(self.bg)
         self.bg = self.bg.convert("RGB")
         self.boncuk = BoncukDurum(ses, 150, 1530, 0.55)
-        t = 0.2
-        ses.efekt(t, "pop")
-        t = 0.6
-        t += ses.konus(t, rng.choice(self.GIRISLER)) + 0.3
+        self.boncuk.giris = -0.25
+        t = 0.0
         self.turlar = []
         for k, h in enumerate(hayvanlar):
-            r = {"h": h, "giris": t}
+            # ilk gölge 0. karede zaten ekrana kayıyor (Shorts'ta ilk 2 saniye kritik)
+            r = {"h": h, "giris": t - 0.2 if k == 0 else t}
             ses.efekt(t, "whoosh", 0.7)
-            t += 0.45
+            t += 0.25 if k == 0 else 0.45
             soru = "Bu kimin gölgesi?" if k == 0 else ("Peki bu kimin gölgesi?" if k == 1 else "Son soru! Bu kimin gölgesi?")
             t += ses.konus(t, soru) + 0.15
             t += ses.konus(t, h["ipucu"]) + 0.25
@@ -994,6 +1001,9 @@ def logo(boyut=150):
 
 
 # ---------------------------------------------------------------- render
+ACILIS_KARE = 12  # 0,4 sn
+
+
 def video_yap(sahne: Sahne, ses: Ses, seed: int, cikti: pathlib.Path, onizleme=False):
     cikti.parent.mkdir(parents=True, exist_ok=True)
     wav = cikti.with_suffix(".wav")
@@ -1007,6 +1017,11 @@ def video_yap(sahne: Sahne, ses: Ses, seed: int, cikti: pathlib.Path, onizleme=F
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     for f in range(n):
         kare = sahne.kare(f / FPS)
+        if f < ACILIS_KARE:  # açılışta hafif "kamera yakınlaşması": ilk karelerde hareket hissi
+            z = 1 + 0.08 * (1 - f / ACILIS_KARE) ** 2
+            buyuk = kare.resize((int(W * z), int(H * z)), Image.BILINEAR)
+            ox, oy = (buyuk.width - W) // 2, (buyuk.height - H) // 2
+            kare = buyuk.crop((ox, oy, ox + W, oy + H))
         yapistir(kare, logo(110), 80, 420, 1.0, 0.9)  # köşe logosu (kanal imzası)
         if olcek != 1.0:
             kare = kare.resize((cw, ch), Image.BILINEAR)
