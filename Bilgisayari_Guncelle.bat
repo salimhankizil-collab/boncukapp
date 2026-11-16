@@ -7,10 +7,8 @@ echo.
 git pull --rebase --autostash origin main
 if errorlevel 1 ( echo HATA: GitHub'dan cekilemedi. & pause & exit /b 1 )
 echo.
-echo  Buluttaki bolum videolari indiriliyor (zaten olanlar atlanir)...
-for /f "delims=" %%r in ('gh release list --repo salimhankizil-collab/boncukapp --limit 100 --json tagName -q ".[].tagName"') do (
-  gh release download %%r --repo salimhankizil-collab/boncukapp --dir "videolar\%%r" --skip-existing
-)
+echo  Buluttaki yeni bolum videolari indiriliyor (bilgisayarda olanlar atlanir)...
+python uretim\videolari_indir.py
 echo.
-echo  Tamam! Kod GitHub ile ayni, yeni videolar "videolar" klasorunde.
+echo  Tamam! Kod GitHub ile ayni, yeni videolar "videolar" klasorunde kendi bolum klasorlerinde.
 pause
