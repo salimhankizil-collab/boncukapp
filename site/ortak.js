@@ -27,7 +27,11 @@
   if (window.speechSynthesis) speechSynthesis.onvoiceschanged = sesleriYukle;
   const sesSec = (dil) => sesler.find((v) => v.lang && v.lang.toLowerCase().startsWith(dil)) || null;
   B.sessiz = false;
-  B.soyle = (metin, dil = 'tr') => new Promise((bitti) => {
+  // soyle() konuşma sonuna kadar bekler; B.sustur() ile kesilirse false döner (oyun sıradaki cümleye geçmesin diye).
+  let nesil = 0;
+  B.soyle = (metin, dil = 'tr') => new Promise((cozum) => {
+    const benim = nesil;
+    const bitti = () => cozum(benim === nesil);
     if (B.sessiz || !window.speechSynthesis) { setTimeout(bitti, 350 + metin.length * 45); return; }
     try {
       const u = new SpeechSynthesisUtterance(metin);
@@ -43,7 +47,7 @@
       speechSynthesis.speak(u);
     } catch (e) { bitti(); }
   });
-  B.sustur = () => { try { speechSynthesis.cancel(); } catch (e) { /* yok */ } };
+  B.sustur = () => { nesil++; try { speechSynthesis.cancel(); } catch (e) { /* yok */ } };
 
   // ---- ses efektleri (WebAudio ile üretilir, dosya yok) ----
   let ctx = null;

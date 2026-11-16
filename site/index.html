@@ -127,16 +127,14 @@
     const B = window.Boncuk;
     const img = document.getElementById('boncuk-resim');
     const ad = document.getElementById('renk-adi');
-    let i = -1, mesgul = false;
+    let i = -1;
     document.getElementById('boncuk-dugme').addEventListener('click', async () => {
-      if (mesgul) return; mesgul = true;
-      B.sesiAc(); B.efekt.pop();
+      B.sustur(); B.sesiAc(); B.efekt.pop();  // her dokunuşta hemen yeni renge geç
       i = (i + 1) % B.RENKLER.length;
       const r = B.RENKLER[i];
       img.src = `img/boncuk-${r.anahtar}.png`;
       ad.textContent = `${r.ad} · ${r.ing}`; ad.style.color = r.renk;
-      await B.soyle(r.ad + '!'); await B.soyle(r.ing + '!', 'en');
-      mesgul = false;
+      if (await B.soyle(r.ad + '!')) B.soyle(r.ing + '!', 'en');
     });
   })();
 </script>

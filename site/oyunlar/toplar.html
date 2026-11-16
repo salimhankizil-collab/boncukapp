@@ -86,7 +86,7 @@
     $('ilerleme').replaceChildren(...secim.map(() => document.createElement('i')));
   }
 
-  async function tur() {
+  async function tur(giris) {
     const r = sira[i];
     const top = $('top');
     top.hidden = false; top.style.setProperty('--c', r.renk);
@@ -97,10 +97,10 @@
     const en = document.createElement('small'); en.textContent = r.ing;
     $('kelime').append(tr, en);
     B.efekt.pop();
-    bekliyor = false;
-    await B.soyle(r.ad + '!');
+    bekliyor = true;  // çocuk Boncuk'un konuşmasını beklemeden dokunabilir
+    if (giris && !(await B.soyle(giris))) return;
+    if (!(await B.soyle(r.ad + '!'))) return;
     await B.soyle(r.ing + '!', 'en');
-    bekliyor = true;
   }
 
   async function sec(bardak, r) {
@@ -109,12 +109,10 @@
     if (r.anahtar !== hedef.anahtar) {
       bardak.classList.remove('salla'); void bardak.offsetWidth; bardak.classList.add('salla');
       B.efekt.hata();
-      bekliyor = false;
-      await B.soyle(`Bu ${r.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
-      bekliyor = true;
+      B.sustur(); B.soyle(`Bu ${r.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
       return;
     }
-    bekliyor = false;
+    bekliyor = false; B.sustur();
     const top = $('top');
     const a = top.getBoundingClientRect(), b = bardak.getBoundingClientRect();
     const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height * 0.12 - (a.top + a.height / 2);
@@ -141,10 +139,9 @@
 
   $('baslat-dugme').addEventListener('click', async () => {
     B.sesiAc(); $('baslat').hidden = true; kur();
-    await B.soyle('Hadi topları renklerine göre bardaklara koyalım!');
-    tur();
+    tur('Hadi topları renklerine göre bardaklara koyalım!');
   });
-  $('tekrar').addEventListener('click', () => { $('bitti').hidden = true; kur(); tur(); });
+  $('tekrar').addEventListener('click', () => { B.sustur(); $('bitti').hidden = true; kur(); tur(); });
   $('ses-dugme').addEventListener('click', (e) => {
     B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
     e.currentTarget.setAttribute('aria-pressed', String(B.sessiz));

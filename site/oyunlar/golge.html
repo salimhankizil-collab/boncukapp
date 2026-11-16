@@ -15,6 +15,8 @@
   #hayvan { width: 74%; transition: filter .35s ease; }
   #hayvan.golge { filter: brightness(0) opacity(.85); }
   .secenekler { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 3vw, 18px); width: 100%; max-width: 560px; }
+  .secenek.soluk { opacity: .35; }
+  .secenek:disabled { cursor: default; }
   .secenek { border: 0; background: var(--kart); border-radius: 22px; box-shadow: var(--golge); padding: 10px; cursor: pointer; aspect-ratio: 1; display: grid; place-items: center; }
   .secenek img { width: 82%; }
   .secenek:active { transform: translateY(3px); }
@@ -93,21 +95,21 @@
       return b;
     }));
     B.efekt.pop();
-    bekliyor = false;
-    await B.soyle(i === 0 ? 'Bu kimin gölgesi?' : (i === sira.length - 1 ? 'Son soru! Bu kimin gölgesi?' : 'Peki bu kimin gölgesi?'));
+    bekliyor = true;  // çocuk Boncuk'un konuşmasını beklemeden dokunabilir
+    if (!(await B.soyle(i === 0 ? 'Bu kimin gölgesi?' : (i === sira.length - 1 ? 'Son soru! Bu kimin gölgesi?' : 'Peki bu kimin gölgesi?')))) return;
     await B.soyle(h.ipucu);
-    bekliyor = true;
   }
   async function sec(dugme, x) {
     if (!bekliyor) return;
     const h = sira[i];
     if (x.kod !== h.kod) {
       dugme.classList.remove('salla'); void dugme.offsetWidth; dugme.classList.add('salla');
-      B.efekt.hata(); bekliyor = false;
-      await B.soyle(`Bu bir ${kucuk(x.ad)}. Tekrar dene!`);
-      bekliyor = true; return;
+      B.efekt.hata();
+      B.sustur(); B.soyle(`Bu bir ${kucuk(x.ad)}. Tekrar dene!`);
+      return;
     }
-    bekliyor = false;
+    bekliyor = false; B.sustur();
+    $('secenekler').querySelectorAll('button').forEach((d) => { d.disabled = true; if (d !== dugme) d.classList.add('soluk'); });
     const img = $('hayvan');
     img.classList.remove('golge'); img.classList.add('hopla');
     setTimeout(() => img.classList.remove('hopla'), 600);
@@ -133,7 +135,7 @@
     try { await veriYukle(); } catch (e) { $('bilgi').textContent = 'Hayvanlar yüklenemedi. İnternet bağlantını kontrol et.'; return; }
     kur(); tur();
   });
-  $('tekrar').addEventListener('click', () => { $('bitti').hidden = true; kur(); tur(); });
+  $('tekrar').addEventListener('click', () => { B.sustur(); $('bitti').hidden = true; kur(); tur(); });
   $('ses-dugme').addEventListener('click', (e) => {
     B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
     e.currentTarget.setAttribute('aria-pressed', String(B.sessiz));

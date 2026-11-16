@@ -81,26 +81,26 @@
     $('boncuk').src = '../img/boncuk.png';
     $('tepsi').replaceChildren(...B.karistir(secim).map((r) => { const b = blok(r); b.addEventListener('click', () => sec(b, r)); return b; }));
   }
-  async function tur() {
+  async function tur(giris) {
     const r = sira[i];
     $('kelime').innerHTML = '';
     const tr = document.createElement('span'); tr.textContent = r.ad.toLocaleUpperCase('tr'); tr.style.color = r.renk;
     const en = document.createElement('small'); en.textContent = 'Find ' + r.ing.toLowerCase() + '!';
     $('kelime').append(tr, en);
-    bekliyor = false;
-    await B.soyle(`${r.ad} bloğu bul!`);
+    bekliyor = true;  // çocuk Boncuk'un konuşmasını beklemeden dokunabilir
+    if (giris && !(await B.soyle(giris))) return;
+    if (!(await B.soyle(`${r.ad} bloğu bul!`))) return;
     await B.soyle(`Find ${r.ing.toLowerCase()}!`, 'en');
-    bekliyor = true;
   }
   async function sec(b, r) {
     if (!bekliyor) return;
     if (r.anahtar !== sira[i].anahtar) {
       b.classList.remove('salla'); void b.offsetWidth; b.classList.add('salla');
-      B.efekt.hata(); bekliyor = false;
-      await B.soyle(`Bu ${r.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
-      bekliyor = true; return;
+      B.efekt.hata();
+      B.sustur(); B.soyle(`Bu ${r.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
+      return;
     }
-    bekliyor = false;
+    bekliyor = false; B.sustur();
     b.disabled = true;
     const yeni = blok(r); yeni.tabIndex = -1; yeni.setAttribute('aria-hidden', 'true');
     $('kule').append(yeni);
@@ -131,10 +131,9 @@
 
   $('baslat-dugme').addEventListener('click', async () => {
     B.sesiAc(); $('baslat').hidden = true; kur();
-    await B.soyle('Hadi renkli bloklarla kocaman bir kule yapalım!');
-    tur();
+    tur('Hadi renkli bloklarla kocaman bir kule yapalım!');
   });
-  $('tekrar').addEventListener('click', () => { $('bitti').hidden = true; kur(); tur(); });
+  $('tekrar').addEventListener('click', () => { B.sustur(); $('bitti').hidden = true; kur(); tur(); });
   $('ses-dugme').addEventListener('click', (e) => {
     B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
     e.currentTarget.setAttribute('aria-pressed', String(B.sessiz));
