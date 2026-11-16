@@ -13,6 +13,7 @@ import hashlib
 import math
 import pathlib
 import subprocess
+import time
 import wave
 from functools import lru_cache
 
@@ -378,14 +379,15 @@ def seslendir(metin, dil="tr"):
 
         async def _k():
             await edge_tts.Communicate(metin, ses, rate=hiz, pitch=perde).save(str(gecici))
-        for deneme in range(3):
+        for deneme in range(5):
             try:
                 asyncio.run(_k())
                 gecici.replace(yol)
                 break
-            except Exception:  # noqa: BLE001
-                if deneme == 2:
+            except Exception:  # noqa: BLE001  (ses servisi bazen anlık yanıt vermiyor: bekleyip tekrar dene)
+                if deneme == 4:
                     raise
+                time.sleep(3 * (deneme + 1))
     s = _mp3_np(yol)
     idx = np.where(np.abs(s) > 0.015)[0]
     if len(idx):

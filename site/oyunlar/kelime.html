@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hangisi? · Boncuk</title>
+<meta name="theme-color" content="#2680f0">
+<meta name="sw" content="../sw.js">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../img/favicon.png">
+<link rel="stylesheet" href="../ortak.css">
+<link rel="stylesheet" href="../oyun.css">
+<style>
+  .arkadaslar { display: flex; align-items: flex-end; justify-content: center; gap: clamp(4px, 2vw, 14px); }
+  .arkadaslar img { width: clamp(72px, 19vw, 120px); transition: transform .2s; }
+  .arkadaslar img.konusuyor { animation: konus .5s ease-in-out infinite alternate; }
+  @keyframes konus { to { transform: translateY(-8px) rotate(-3deg); } }
+  .soru { font-family: var(--font-baslik); font-weight: 800; font-size: clamp(1.6rem, 6vw, 2.4rem); text-align: center; margin: 0; min-height: 1.3em; }
+  .secenekler { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 3vw, 18px); width: 100%; max-width: 560px; }
+  .secenek { border: 0; background: var(--kart); border-radius: 22px; box-shadow: var(--golge); padding: 10px; cursor: pointer; aspect-ratio: 1; display: grid; place-items: center; }
+  .secenek img { width: 78%; }
+  .secenek:active { transform: translateY(3px); }
+  .secenek.soluk { opacity: .35; }
+  .secenek.dogru { outline: 6px solid var(--yesil); }
+  .secenek:disabled { cursor: default; }
+</style>
+</head>
+<body>
+<div class="oyun">
+  <header class="oyun-ust">
+    <a class="yuvarlak" href="../" aria-label="Ana sayfaya dön">←</a>
+    <h1>Hangisi?</h1>
+    <button class="yuvarlak" id="ses-dugme" type="button" aria-label="Sesi kapat" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="ses-dalga" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+  <div class="alan">
+    <div class="ilerleme" id="ilerleme" aria-hidden="true"></div>
+    <div class="arkadaslar" aria-hidden="true">
+      <img id="minik" src="../img/minik.png" alt="">
+      <img id="boncuk" src="../img/boncuk.png" alt="">
+      <img id="pamuk" src="../img/pamuk.png" alt="">
+    </div>
+    <p class="soru" id="soru" aria-live="polite"></p>
+    <div class="kelime" id="kelime" aria-live="polite"></div>
+    <div class="secenekler" id="secenekler"></div>
+  </div>
+</div>
+
+<div class="perde" id="baslat">
+  <div class="kutu">
+    <img src="../img/pamuk.png" alt="">
+    <h2>Boncuk soruyor, sen doğrusunu bul!</h2>
+    <button class="dugme turuncu" id="baslat-dugme" type="button">▶ Oyna</button>
+  </div>
+</div>
+<div class="perde" id="bitti" hidden>
+  <div class="kutu">
+    <img src="../img/minik-mutlu.png" alt="">
+    <h2>Hepsini buldun!</h2>
+    <div class="satir">
+      <button class="dugme turuncu" id="tekrar" type="button">Bir daha oyna</button>
+      <a class="dugme acik" href="../#oyunlar">Diğer oyunlar</a>
+    </div>
+  </div>
+</div>
+
+<script src="../ortak.js"></script>
+<script>
+(function () {
+  const B = window.Boncuk;
+  const $ = (id) => document.getElementById(id);
+  const istenen = B.param('esya') || '';
+  const TUR = 5;
+  let tum = [], sira = [], i = 0, bekliyor = false;
+  const resim = (e) => `../img/esya/${e.kod}.png`;
+  const SORUCU = ['boncuk', 'pamuk', 'minik'];
+
+  async function veriYukle() {
+    if (tum.length) return;
+    tum = await (await fetch('../veri/esyalar.json')).json();
+  }
+  function kur() {
+    const ilk = tum.find((e) => e.kod === istenen);
+    const kalan = B.karistir(tum.filter((e) => e !== ilk));
+    sira = (ilk ? [ilk, ...kalan] : kalan).slice(0, TUR);
+    i = 0;
+    $('ilerleme').replaceChildren(...sira.map(() => document.createElement('i')));
+  }
+  function konusan(ad) {
+    SORUCU.forEach((k) => $(k).classList.toggle('konusuyor', k === ad));
+  }
+  async function tur() {
+    const e = sira[i];
+    $('kelime').innerHTML = '';
+    $('soru').textContent = `${e.ad} hangisi?`;
+    const digerleri = B.karistir(tum.filter((x) => x.kod !== e.kod)).slice(0, 2);
+    $('secenekler').replaceChildren(...B.karistir([e, ...digerleri]).map((x) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'secenek'; b.setAttribute('aria-label', x.ad);
+      const im = document.createElement('img'); im.src = resim(x); im.alt = '';
+      b.append(im);
+      b.addEventListener('click', () => sec(b, x));
+      return b;
+    }));
+    B.efekt.pop();
+    bekliyor = true;  // çocuk soruyu beklemeden dokunabilir
+    konusan(SORUCU[i % 3]);
+    await B.soyle(`${e.ad} hangisi?`);
+    konusan('');
+  }
+  async function sec(dugme, x) {
+    if (!bekliyor) return;
+    const e = sira[i];
+    if (x.kod !== e.kod) {
+      dugme.classList.remove('salla'); void dugme.offsetWidth; dugme.classList.add('salla');
+      B.efekt.hata();
+      B.sustur(); B.soyle(`Bu ${x.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
+      return;
+    }
+    bekliyor = false; B.sustur();
+    $('secenekler').querySelectorAll('button').forEach((d) => { d.disabled = true; d.classList.add(d === dugme ? 'dogru' : 'soluk'); });
+    B.efekt.ding(); B.konfeti(40);
+    $('ilerleme').children[i].classList.add('tamam');
+    const tr = document.createElement('span'); tr.textContent = e.ad.toLocaleUpperCase('tr'); tr.style.color = 'var(--kirmizi)';
+    const en = document.createElement('small'); en.textContent = e.ing;
+    $('kelime').replaceChildren(tr, en);
+    $('minik').src = '../img/minik-mutlu.png'; $('pamuk').src = '../img/pamuk-mutlu.png';
+    konusan('boncuk');
+    await B.soyle(`Evet! ${e.ad}!`);
+    await B.soyle(e.ing + '!', 'en');
+    konusan('');
+    $('minik').src = '../img/minik.png'; $('pamuk').src = '../img/pamuk.png';
+    await B.bekle(400);
+    i++;
+    if (i < sira.length) { tur(); return; }
+    B.efekt.tada(); B.konfeti();
+    await B.soyle('Süpersin! Hepsini buldun!');
+    $('bitti').hidden = false;
+  }
+
+  $('baslat-dugme').addEventListener('click', async () => {
+    B.sesiAc(); $('baslat').hidden = true;
+    try { await veriYukle(); } catch (e) { $('soru').textContent = 'Oyun yüklenemedi. İnternet bağlantını kontrol et.'; return; }
+    kur(); tur();
+  });
+  $('tekrar').addEventListener('click', () => { B.sustur(); $('bitti').hidden = true; kur(); tur(); });
+  $('ses-dugme').addEventListener('click', (ev) => {
+    B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
+    ev.currentTarget.setAttribute('aria-pressed', String(B.sessiz));
+    ev.currentTarget.setAttribute('aria-label', B.sessiz ? 'Sesi aç' : 'Sesi kapat');
+    $('ses-dalga').style.opacity = B.sessiz ? 0.15 : 1;
+  });
+})();
+</script>
+</body>
+</html>

@@ -29,7 +29,7 @@
   #renk-adi { position: absolute; top: 4px; font-family: var(--font-baslik); font-weight: 800; font-size: 2rem; min-height: 1.2em; }
   @keyframes zipla { 0%, 100% { transform: translateY(0) scale(1, 1); } 45% { transform: translateY(-14px) scale(.98, 1.03); } 55% { transform: translateY(-14px); } }
   #kur-yardim { margin-top: 12px; font-weight: 700; }
-  .oyun-kart .resim.r1 { background: #ffe1e1; } .oyun-kart .resim.r2 { background: #e2ecff; } .oyun-kart .resim.r3 { background: #fff0cf; }
+  .oyun-kart .resim.r1 { background: #ffe1e1; } .oyun-kart .resim.r2 { background: #e2ecff; } .oyun-kart .resim.r3 { background: #fff0cf; } .oyun-kart .resim.r4 { background: #e6f7e4; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
   .mini-toplar { display: flex; gap: 8px; }
   .mini-toplar i { width: 34px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff8 0 18%, transparent 19%), var(--c); }
   .mini-kule { display: flex; flex-direction: column-reverse; gap: 4px; }
@@ -91,6 +91,11 @@
         <div class="resim r3"><div class="mini-kule"><i style="--c:var(--kirmizi)"></i><i style="--c:var(--turuncu)"></i><i style="--c:var(--yesil)"></i><i style="--c:var(--mavi)"></i></div></div>
         <h3>Renkli Kule</h3>
         <span class="soluk">Söylenen rengi bul, kuleyi yap.</span>
+      </a>
+      <a class="kart oyun-kart" href="oyunlar/kelime.html">
+        <div class="resim r4"><img src="img/pamuk.png" alt="" style="width:46%"><img src="img/minik.png" alt="" style="width:40%"></div>
+        <h3>Hangisi?</h3>
+        <span class="soluk">Boncuk, Pamuk ve Minik soruyor: doğru eşyayı bul.</span>
       </a>
     </div>
   </section>

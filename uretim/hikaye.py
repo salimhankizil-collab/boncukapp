@@ -196,7 +196,12 @@ class Karakter:
         agiz = 0 if a < 0.12 else (1 if a < 0.4 else (2 if a < 0.7 else 3))
         ifade = self.ifade(t)
         kirp = ((t + 1.5 + self.faz) % 3.4) < 0.13
-        sp = self.ciz_fn(kirp, agiz, ifade)
+        cizim_ifade = ifade
+        if ifade == "uyku":
+            kirp, cizim_ifade = True, "normal"
+        elif ifade == "saskin":
+            agiz, cizim_ifade = max(agiz, 2), "normal"
+        sp = self.ciz_fn(kirp, agiz, cizim_ifade)
         giris = ease_out_back((t - self.giris) / 0.5)
         hop = 0.0
         for zt in self.zipla:
@@ -236,9 +241,16 @@ class Karakter:
 class Nesne:
     """Top gibi bir nesne: yaylar çizerek uçar ya da bir karakterin elinde taşınır."""
 
-    def __init__(self, sprite, x, y):
+    def __init__(self, sprite, x, y, gorunur=True):
         self.sprite, self.bas = sprite, (x, y)
         self.olaylar = []  # ("yol", t0, t1, a, b, h) / ("tasi", t0, t1, karakter)
+        self.gorunurluk = [(-9.0, gorunur)]
+
+    def goster(self, t, acik):
+        self.gorunurluk.append((t, acik))
+
+    def gorunur(self, t):
+        return max((g for g in self.gorunurluk if g[0] <= t), key=lambda g: g[0])[1]
 
     def at(self, t0, sure, hedef, yukseklik):
         self.olaylar.append(("yol", t0, t0 + sure, self.konum(t0), hedef, yukseklik))
@@ -267,11 +279,90 @@ class Nesne:
         return x, y
 
     def ciz(self, tv, t):
+        if not self.gorunur(t):
+            return
+        acilis = max((g[0] for g in self.gorunurluk if g[0] <= t and g[1]), default=-9.0)
+        olcek = ease_out_back(clamp((t - acilis) / 0.35)) if acilis > -9 else 1.0
         x, y = self.konum(t)
-        yapistir(tv, self.sprite, x, y + 6 * math.sin(t * 3), 1.0, 1.0, (t * 220) % 360 if self._ucuyor(t) else 0)
+        yapistir(tv, self.sprite, x, y + 6 * math.sin(t * 3), olcek, 1.0, (t * 220) % 360 if self._ucuyor(t) else 0)
 
     def _ucuyor(self, t):
         return any(o[0] == "yol" and o[1] <= t < o[2] for o in self.olaylar)
+
+
+def park_arka_plani():
+    """Güneşli park: gökyüzü, güneş, ağaç, çiçekler, çimen."""
+    im = motor.arka_plan((140, 205, 255), (215, 240, 255)).convert("RGBA")
+    d = ImageDraw.Draw(im)
+    d.ellipse([-200, 1150, 700, 1500], fill=(140, 214, 120))
+    d.ellipse([400, 1180, 1300, 1500], fill=(120, 200, 104))
+    d.rectangle([0, 1330, W, H], fill=(112, 196, 96))
+    for y in range(1370, H, 70):
+        for x in range(30 + (y // 70 % 2) * 40, W, 80):
+            d.line([x, y, x - 8, y - 18], fill=(92, 172, 80), width=4)
+    _emoji_yapistir(im, "1f333", 170, 980, 420)
+    for x, kod in ((690, "1f337"), (760, "1f33b"), (900, "1f337")):
+        _emoji_yapistir(im, kod, x, 1300, 110)
+    _emoji_yapistir(im, "2600", 880, 520, 170)
+    return im
+
+
+def gece_arka_plani():
+    """Gece yatak odası: lacivert duvar, ay ve yıldızlı pencere, sıcak gece lambası."""
+    im = motor.arka_plan((54, 52, 120), (96, 84, 168)).convert("RGBA")
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([600, 470, 900, 800], 28, fill=(230, 220, 255))
+    d.rounded_rectangle([618, 488, 882, 782], 20, fill=(28, 30, 80))
+    for x, y in ((660, 540), (840, 600), (700, 720), (820, 520), (760, 660)):
+        _emoji_yapistir(im, "2b50", x, y, 34)
+    _emoji_yapistir(im, "1f319", 770, 600, 110)
+    d.line([750, 488, 750, 782], fill=(230, 220, 255), width=14)
+    lamba = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(lamba).ellipse([60, 460, 520, 920], fill=(255, 220, 140, 70))
+    from PIL import ImageFilter
+    im.alpha_composite(lamba.filter(ImageFilter.GaussianBlur(60)))
+    d.polygon([(220, 600), (360, 600), (330, 680), (250, 680)], fill=(255, 200, 120))
+    d.rectangle([284, 680, 296, 800], fill=(200, 160, 120))
+    zemin = 1330
+    d.rectangle([0, zemin, W, H], fill=(120, 96, 160))
+    d.rectangle([0, zemin - 18, W, zemin], fill=(200, 190, 240))
+    d.ellipse([60, 1370, 1020, 1520], fill=(170, 150, 220))
+    return im
+
+
+def banyo_arka_plani():
+    """Banyo: açık mavi fayanslar, ayna, lavabo."""
+    im = Image.new("RGBA", (W, H), (205, 236, 250, 255))
+    d = ImageDraw.Draw(im)
+    for y in range(380, 1330, 90):
+        d.line([0, y, W, y], fill=(185, 222, 240), width=4)
+    for x in range(0, W, 90):
+        d.line([x, 380, x, 1330], fill=(185, 222, 240), width=4)
+    d.rounded_rectangle([600, 470, 900, 760], 40, fill=(255, 255, 255))
+    d.rounded_rectangle([622, 492, 878, 738], 30, fill=(225, 245, 255))
+    d.line([660, 530, 720, 600], fill=(255, 255, 255), width=12)
+    d.rounded_rectangle([170, 760, 470, 830], 20, fill=(255, 255, 255))
+    d.rectangle([300, 700, 330, 760], fill=(190, 200, 210))
+    _emoji_yapistir(im, "1f9fc", 420, 720, 80)
+    zemin = 1330
+    d.rectangle([0, zemin, W, H], fill=(150, 200, 230))
+    for x in range(0, W, 120):
+        d.line([x, zemin, x, H], fill=(130, 184, 216), width=4)
+    d.rectangle([0, zemin - 18, W, zemin], fill=(255, 255, 255))
+    return im
+
+
+@lru_cache(maxsize=64)
+def emoji(kod, boyut):
+    return motor.hayvan_sprite(kod, boyut)
+
+
+def _emoji_yapistir(im, kod, x, y, boyut):
+    sp = emoji(kod, boyut)
+    im.alpha_composite(sp, (int(x - sp.width / 2), int(y - sp.height / 2)))
+
+
+SAHNELER = {}
 
 
 def oda_arka_plani():
@@ -306,6 +397,9 @@ def oda_arka_plani():
     return im
 
 
+SAHNELER.update({"oda": oda_arka_plani, "park": park_arka_plani, "gece": gece_arka_plani, "banyo": banyo_arka_plani})
+
+
 class Hikaye(Sahne):
     baslik = "Boncuk ve Arkadaşları"
 
@@ -313,7 +407,9 @@ class Hikaye(Sahne):
         super().__init__(rng, ses)
         self.senaryo = senaryo
         self.alt_baslik = senaryo["baslik"]
-        self.bg = oda_arka_plani()
+        self.bg = SAHNELER[senaryo.get("sahne", "oda")]()
+        for kod, x, y, boyut in senaryo.get("dekor", []):
+            _emoji_yapistir(self.bg, kod, x, y, boyut)
         motor.yapistir(self.bg, motor.gokkusagi_yazi(self.baslik, 84), W / 2, 205)
         motor.yapistir(self.bg, yazi_sprite(self.alt_baslik, 62, KOYU_YAZI, (255, 255, 255), 10), W / 2, 312)
         self.bg = self.bg.convert("RGB")
@@ -330,7 +426,11 @@ class Hikaye(Sahne):
         self.top = None
         if top:
             self.top = Nesne(kure(top["renk"], 52), *self._yer(top["yer"], 0.0, 0))
-        self.kartlar, self.parilti, self.kamera = [], [], []
+        nesne = senaryo.get("nesne")
+        if nesne:  # emoji eşya (ayıcık, şemsiye...): "top" ile aynı eylemleri kullanır
+            self.top = Nesne(emoji(nesne["emoji"], nesne.get("boyut", 140)), *self._yer(nesne["yer"], 0.0, 0),
+                             nesne.get("gorunur", True))
+        self.kartlar, self.parilti, self.kamera, self.yagmur = [], [], [], []
         self.konfeti = None
         t = 0.0
         for v in senaryo["vuruslar"]:
@@ -387,6 +487,17 @@ class Hikaye(Sahne):
             self._yakin = (t, v["yakin"])
         if "efekt" in v:
             ses.efekt(t, v["efekt"])
+        if "sus" in v:  # konuşmadan bekleme (ör. uyuyan karakterlerle açılış)
+            bekle = max(bekle, v["sus"])
+        if "nesne" in v and self.top:  # "goster" / "gizle"
+            self.top.goster(t, v["nesne"] == "goster")
+            ses.efekt(t, "pop")
+        if "yagmur" in v:
+            if v["yagmur"]:
+                self.yagmur.append([t, 1e9])
+                ses.efekt(t, "whoosh", 0.8)
+            elif self.yagmur:
+                self.yagmur[-1][1] = t
         t += bekle
         if "kart" in v:
             tr, en, renk = v["kart"]
@@ -440,6 +551,18 @@ class Hikaye(Sahne):
         for kart in self.kartlar:
             self.kelime_ciz(tv, motor.tr_buyuk(kart["tr"]), kart["renk"], W / 2, 760, t, kart["bas"], kart["bit"], 140)
             self.kelime_ciz(tv, kart["en"], KOYU_YAZI, W / 2, 890, t, kart["en_bas"], kart["bit"], 90)
+        for k in self.k.values():  # uyuyanların üstünde Zzz
+            if k.ifade(t) == "uyku":
+                for i in range(3):
+                    u = ((t * 0.6 + i / 3 + k.faz) % 1)
+                    yapistir(tv, yazi_sprite("Z", 70 - i * 12, (120, 130, 220), (255, 255, 255), 8),
+                             k.x(t) + 60 + u * 70, k.taban_y - k.gh * k.olcek - 10 - u * 160, 1.0, 1 - u)
+        for t0, t1 in self.yagmur:
+            if t0 <= t < t1:
+                for i in range(90):
+                    x = (i * 137) % W + 30 * math.sin(i)
+                    y = ((i * 211) % H + (t - t0) * 1500) % (H - 300) + 250
+                    d.line([x, y, x - 8, y + 34], fill=(120, 170, 230), width=5)
         for p in self.parilti:
             p.ciz(d, t)
         if self.konfeti:

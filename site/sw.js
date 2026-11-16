@@ -1,11 +1,11 @@
 // Çevrimdışı çalışma: oyunlar internet olmadan da açılır; video listesi her seferinde önce internetten denenir.
-const SURUM = 'boncuk-v5';  // site güncellenince bu sayıyı artır: telefonlardaki uygulama yeni sürümü alır
+const SURUM = 'boncuk-v6';  // site güncellenince bu sayıyı artır: telefonlardaki uygulama yeni sürümü alır
 const DOSYALAR = [
   './', 'index.html', 'videolar.html', 'gizlilik.html', 'kullanim-sartlari.html', 'ortak.css', 'ortak.js', 'videolar.js', 'oyun.css',
-  'oyunlar/toplar.html', 'oyunlar/golge.html', 'oyunlar/kule.html',
+  'oyunlar/toplar.html', 'oyunlar/golge.html', 'oyunlar/kule.html', 'oyunlar/kelime.html',
   'fonts/Baloo2.ttf', 'img/boncuk.png', 'img/boncuk-mutlu.png', 'img/ikon-192.png',
   'img/boncuk-red.png', 'img/boncuk-orange.png', 'img/boncuk-yellow.png', 'img/boncuk-green.png',
-  'img/boncuk-blue.png', 'img/boncuk-purple.png', 'img/boncuk-pink.png', 'veri/hayvanlar.json',
+  'img/boncuk-blue.png', 'img/boncuk-purple.png', 'img/boncuk-pink.png', 'veri/hayvanlar.json', 'veri/esyalar.json', 'img/pamuk.png', 'img/minik.png', 'img/pamuk-mutlu.png', 'img/minik-mutlu.png',
 ];
 
 self.addEventListener('install', (e) => {

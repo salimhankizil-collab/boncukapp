@@ -3,7 +3,8 @@
 Kullanım:
     python uret.py              -> sıradaki 1 bölümü üretir
     python uret.py --adet 7     -> bir haftalık (7) bölüm üretir
-    python uret.py --tur golge  -> türü elle seç (toplar / kule / golge)
+    python uret.py --tur golge  -> türü elle seç (toplar / kule / golge / hikaye)
+    python uret.py --yeniden 6-10 -> yüklenmemiş bölümleri aynı içerikle yeniden üret
 """
 import argparse
 import json
@@ -11,13 +12,40 @@ import pathlib
 
 import numpy as np
 
+import hikaye
 import motor
 from hayvanlar import HAYVANLAR
+from hikayeler import HIKAYELER
 
 KOK = pathlib.Path(__file__).parent
 DURUM = KOK / "durum.json"
 CIKTI = KOK.parent / "videolar"
-SIRA = ["toplar", "golge", "kule"]  # türler sırayla döner
+SIRA = ["toplar", "golge", "kule"]  # 1-10. bölümlerin sırası (değiştirme: eski bölümler yeniden üretilebilsin)
+YENI_SIRA_BASI = 13  # 11-12 bulutta eski sırayla üretildi (gölge, kule)
+YENI_SIRA = ["hikaye", "toplar", "hikaye", "golge", "hikaye", "kule"]  # 11. bölümden itibaren: her iki videodan biri hikâye
+TURLER = ["toplar", "golge", "kule", "hikaye"]
+
+
+def tur_bul(no):
+    if no < YENI_SIRA_BASI:
+        return SIRA[(no - 1) % len(SIRA)]
+    return YENI_SIRA[(no - YENI_SIRA_BASI) % len(YENI_SIRA)]
+
+
+def hikaye_bul(no):
+    """Bu bölümün hikâyesi: hikâyeler sırayla kullanılır, bitince baştan döner."""
+    onceki = sum(1 for k in range(YENI_SIRA_BASI, no) if tur_bul(k) == "hikaye")
+    return HIKAYELER[onceki % len(HIKAYELER)]
+
+
+def sahne_kur(no, tur, rng, ses, durum):
+    if tur == "toplar":
+        return motor.Toplar(rng, ses)
+    if tur == "kule":
+        return motor.Kule(rng, ses)
+    if tur == "hikaye":
+        return hikaye.Hikaye(rng, ses, hikaye_bul(no))
+    return motor.Golge(rng, ses, hayvan_sec(rng, durum))
 
 # Açıklamanın sonuna hashtag olarak eklenir (Shorts yüklemede ayrı etiket alanı yok).
 # Toplam 15'i geçmesin: YouTube çok fazla etiketi spam sayar.
@@ -54,6 +82,14 @@ def bilgi_yaz(klasor, tur, no, sahne):
         aciklama = ("Boncuk ile renkli bloklardan kocaman bir kule yapıyoruz. Ama eyvah! Hem Türkçe hem İngilizce renkleri öğreniyoruz.\n\n"
                     "Bu bölümdeki renkler: " + ", ".join(renkler))
         etiket = ["renkleriöğreniyorum", "renklikule", "learncolors", "blocksforkids"]
+    elif tur == "hikaye":
+        h = sahne.senaryo
+        tr, en = h["kelime"]
+        baslik = f"{h['baslik']} {h['emoji']} Boncuk, Pamuk ve Minik | Çocuk Hikâyesi #shorts"
+        aciklama = (f"Boncuk, kedi Pamuk ve bebek Minik ile yeni bir hikâye! {h['ozet']}. "
+                    f"Bu bölümde {h['ders']} öğreniyoruz.\n\n"
+                    f"Bu bölümdeki hikâye: {h['baslik']} – kelime: {tr} ({en})")
+        etiket = ["boncukvearkadaşları", "çocukhikayeleri", "kediyavrusu", "değerlereğitimi", "kidsstories"]
     else:
         adlar = [f"{h['ad']} ({h['ing']})" for h in sahne.hayvanlar]
         baslik = "Bu Kimin Gölgesi? 🔦🤔 Hayvanları Tahmin Et! | Boncuk #shorts"
@@ -89,6 +125,8 @@ def meta_kaydet(no, tur, sahne, baslik, aciklama):
         renkler, hayvanlar = [RENK_ANAHTAR[o["ad"]] for o in sahne.toplar], []
     elif tur == "kule":
         renkler, hayvanlar = [RENK_ANAHTAR[b["ad"]] for b in sahne.bloklar], []
+    elif tur == "hikaye":
+        renkler, hayvanlar = [], []
     else:
         renkler, hayvanlar = [], [h["kod"] for h in sahne.hayvanlar]
     hepsi[str(no)] = {
@@ -96,21 +134,20 @@ def meta_kaydet(no, tur, sahne, baslik, aciklama):
         "imza": next((s for s in aciklama.splitlines() if s.startswith("Bu bölümdeki")), ""),
         "renkler": renkler, "hayvanlar": hayvanlar, "release": eski.get("release"),
     }
+    if tur == "hikaye":  # sitedeki kelime oyunu bu bölümün eşyasıyla açılır
+        h = sahne.senaryo
+        hepsi[str(no)]["hikaye"] = h["kod"]
+        hepsi[str(no)]["esya"] = (h.get("nesne") or {}).get("emoji", "")
     BOLUMLER.write_text(json.dumps(dict(sorted(hepsi.items(), key=lambda kv: int(kv[0]))), ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def bolum_uret(tur=None, onizleme=False):
     durum = durum_oku()
     no = durum["bolum"] + 1
-    tur = tur or SIRA[(no - 1) % len(SIRA)]
+    tur = tur or tur_bul(no)
     rng = np.random.default_rng(1000 + no)
     ses = motor.Ses()
-    if tur == "toplar":
-        sahne = motor.Toplar(rng, ses)
-    elif tur == "kule":
-        sahne = motor.Kule(rng, ses)
-    else:
-        sahne = motor.Golge(rng, ses, hayvan_sec(rng, durum))
+    sahne = sahne_kur(no, tur, rng, ses, durum)
     klasor = CIKTI / f"Bolum_{no:03d}_{tur}"
     klasor.mkdir(parents=True, exist_ok=True)
     print(f"Bölüm {no} ({tur}) üretiliyor, süre {sahne.T:.1f} sn ...")
@@ -128,15 +165,10 @@ def bilgileri_yenile():
     son = durum_oku()["bolum"]
     durum = {"bolum": 0, "kullanilan_hayvanlar": []}
     for no in range(1, son + 1):
-        tur = SIRA[(no - 1) % len(SIRA)]
+        tur = tur_bul(no)
         rng = np.random.default_rng(1000 + no)
         ses = motor.Ses()
-        if tur == "toplar":
-            sahne = motor.Toplar(rng, ses)
-        elif tur == "kule":
-            sahne = motor.Kule(rng, ses)
-        else:
-            sahne = motor.Golge(rng, ses, hayvan_sec(rng, durum))
+        sahne = sahne_kur(no, tur, rng, ses, durum)
         klasor = CIKTI / f"Bolum_{no:03d}_{tur}"
         klasor.mkdir(parents=True, exist_ok=True)
         bilgi_yaz(klasor, tur, no, sahne)
@@ -148,15 +180,10 @@ def yeniden_uret(bas, son):
     Hayvan seçimi sırası bozulmasın diye 1. bölümden itibaren sahneler sırayla kurulur, sadece [bas, son] videoya dökülür."""
     durum = {"bolum": 0, "kullanilan_hayvanlar": []}
     for no in range(1, son + 1):
-        tur = SIRA[(no - 1) % len(SIRA)]
+        tur = tur_bul(no)
         rng = np.random.default_rng(1000 + no)
         ses = motor.Ses()
-        if tur == "toplar":
-            sahne = motor.Toplar(rng, ses)
-        elif tur == "kule":
-            sahne = motor.Kule(rng, ses)
-        else:
-            sahne = motor.Golge(rng, ses, hayvan_sec(rng, durum))
+        sahne = sahne_kur(no, tur, rng, ses, durum)
         if no < bas:
             continue
         klasor = CIKTI / f"Bolum_{no:03d}_{tur}"
@@ -169,7 +196,7 @@ def yeniden_uret(bas, son):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--adet", type=int, default=1)
-    ap.add_argument("--tur", choices=SIRA)
+    ap.add_argument("--tur", choices=TURLER)
     ap.add_argument("--onizleme", action="store_true", help="yarım çözünürlük, sayaç ilerlemez")
     ap.add_argument("--bilgi-yenile", action="store_true", help="sadece yukleme_bilgisi.txt dosyalarını yeniden yaz")
     ap.add_argument("--yeniden", metavar="BAS-SON", help="bu aralıktaki bölümleri yeniden üret, ör. 6-10")

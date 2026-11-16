@@ -25,6 +25,18 @@ ADLAR = {
     "1f406": "Leopard", "1f40d": "Snake",
 }
 
+# Hikâye bölümlerinin eşyaları (Boncuk ve Arkadaşları)
+ESYALAR = {
+    "1faa5": "Toothbrush", "1f9e6": "Socks", "2602": "Umbrella", "1f34e": "Red apple", "1f319": "Crescent moon",
+    "1f388": "Balloon", "1f9f8": "Teddy bear", "1f9fc": "Soap", "1f95b": "Glass of milk", "1f36a": "Cookie",
+    "1fa81": "Kite", "1f382": "Birthday cake", "1f58d": "Crayon", "1f955": "Carrot", "2b50": "Star",
+    "1f45f": "Running shoe", "1f381": "Wrapped gift", "1f9e9": "Puzzle piece", "1f353": "Strawberry",
+    "1f366": "Soft ice cream", "1fae7": "Bubbles", "1f4d8": "Blue book", "1f9fa": "Basket", "1f308": "Rainbow",
+    "1f34c": "Banana", "1f4a7": "Droplet", "1f9e2": "Billed cap", "2600": "Sun", "2764": "Red heart",
+    "1f6cf": "Bed", "1f5d1": "Wastebasket", "1f33b": "Sunflower", "1f333": "Deciduous tree", "1f337": "Tulip",
+}
+ADLAR.update(ESYALAR)
+
 
 def indir(url, hedef):
     if hedef.exists() and hedef.stat().st_size > 0:

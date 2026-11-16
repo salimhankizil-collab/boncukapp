@@ -72,5 +72,28 @@ for h in HAYVANLAR:
     hayvan_veri.append({k: h[k] for k in ("kod", "ad", "ing", "ipucu", "bilgi")})
 (SITE / "veri" / "hayvanlar.json").write_text(json.dumps(hayvan_veri, ensure_ascii=False, indent=1), encoding="utf-8")
 
+# "Hangisi?" kelime oyunu: hikâye bölümlerinin eşyaları + Pamuk ve Minik karakter resimleri
+import hikaye  # noqa: E402
+from hikayeler import HIKAYELER  # noqa: E402
+
+ADI_FARKLI = {"2600": ("Güneş", "Sun"), "2764": ("Kalp", "Heart")}  # hikâyenin kelimesi eşyanın adı değilse
+(IMG / "esya").mkdir(exist_ok=True)
+esya_veri, gorulen = [], set()
+for h in HIKAYELER:
+    kod = (h.get("nesne") or {}).get("emoji")
+    if not kod or kod in gorulen:
+        continue
+    gorulen.add(kod)
+    ad, ing = ADI_FARKLI.get(kod, h["kelime"])
+    im = Image.open(motor.VAR / "emoji" / f"{kod}.png").convert("RGBA")
+    im = im.crop(im.getbbox())
+    im.thumbnail((256, 256), Image.LANCZOS)
+    im.save(IMG / "esya" / f"{kod}.png", optimize=True)
+    esya_veri.append({"kod": kod, "ad": ad, "ing": ing})
+(SITE / "veri" / "esyalar.json").write_text(json.dumps(esya_veri, ensure_ascii=False, indent=1), encoding="utf-8")
+for ad, fn in (("pamuk", hikaye.pamuk), ("minik", hikaye.minik)):
+    fn().save(IMG / f"{ad}.png", optimize=True)
+    fn(False, 0, "mutlu").save(IMG / f"{ad}-mutlu.png", optimize=True)
+
 shutil.copy(motor.VAR / "Baloo2.ttf", SITE / "fonts" / "Baloo2.ttf")
 print("site görselleri hazır:", len(list(IMG.rglob("*.png"))), "png")

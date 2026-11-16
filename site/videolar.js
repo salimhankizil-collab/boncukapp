@@ -4,6 +4,7 @@
     toplar: { ad: 'Renkli toplar', oyun: 'oyunlar/toplar.html' },
     kule: { ad: 'Renkli kule', oyun: 'oyunlar/kule.html' },
     golge: { ad: 'Gölge bilmecesi', oyun: 'oyunlar/golge.html' },
+    hikaye: { ad: 'Boncuk ve Arkadaşları', oyun: 'oyunlar/kelime.html' },
   };
   const temizBaslik = (b) => String(b || '').replace(/\s*\|\s*Boncuk.*$/i, '').replace(/#\S+/g, '').trim();
   const tarih = (t) => { try { return new Date(t.replace(' ', 'T') + ':00+03:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }); } catch (e) { return ''; } };

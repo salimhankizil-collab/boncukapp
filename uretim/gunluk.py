@@ -42,7 +42,7 @@ VARSAYILAN = {
     "tampon_gun": 7,           # elde en az bu kadar yüklenmemiş bölüm tutulur
     "gunluk_en_fazla_yukleme": 2,
 }
-TUR_ADI = {"toplar": "Renkli toplar", "golge": "Gölge bilmecesi", "kule": "Renkli kule"}
+TUR_ADI = {"toplar": "Renkli toplar", "golge": "Gölge bilmecesi", "kule": "Renkli kule", "hikaye": "Boncuk ve Arkadaşları"}
 
 
 def oku(yol, varsayilan):
@@ -69,6 +69,8 @@ def mp4_yolu(no, b):
 
 
 def oyun_linki(b):
+    if b["tur"] == "hikaye":
+        return "oyunlar/kelime.html?esya=" + b.get("esya", "")
     if b["tur"] == "golge":
         return "oyunlar/golge.html?hayvanlar=" + ",".join(b["hayvanlar"])
     return f"oyunlar/{b['tur']}.html?renkler=" + ",".join(b["renkler"])
@@ -235,7 +237,8 @@ def calistir(yukleme_yok=False):
     for v in videolar:
         no = vid_bol.get(v["id"])
         b = bol.get(str(no)) if no else None
-        tur = b["tur"] if b else ("golge" if "Gölgesi" in v["baslik"] else "kule" if "Kule" in v["baslik"] else "toplar")
+        tur = b["tur"] if b else ("golge" if "Gölgesi" in v["baslik"] else "kule" if "Kule" in v["baslik"]
+                                  else "hikaye" if "Pamuk" in v["baslik"] else "toplar")
         if v["gorunurluk"] == "public":
             durum = "Yayında"
         elif v["gorunurluk"] == "private" and v["plan"]:
