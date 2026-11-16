@@ -1,5 +1,5 @@
 // Çevrimdışı çalışma: oyunlar internet olmadan da açılır; video listesi her seferinde önce internetten denenir.
-const SURUM = 'boncuk-v2';
+const SURUM = 'boncuk-v3';  // site güncellenince bu sayıyı artır: telefonlardaki uygulama yeni sürümü alır
 const DOSYALAR = [
   './', 'index.html', 'videolar.html', 'gizlilik.html', 'ortak.css', 'ortak.js', 'videolar.js', 'oyun.css',
   'oyunlar/toplar.html', 'oyunlar/golge.html', 'oyunlar/kule.html',
@@ -9,7 +9,7 @@ const DOSYALAR = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((a) => a !== SURUM).map((a) => caches.delete(a)))).then(() => self.clients.claim()));

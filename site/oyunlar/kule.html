@@ -114,7 +114,8 @@
     $('kelime').textContent = '';
     await B.soyle('Vay! Kule çok yükseldi!');
     const kule = $('kule');
-    await kule.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-4deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(8deg)' }], { duration: 1300, easing: 'ease-in-out' }).finished;
+    kule.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-4deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(8deg)' }], { duration: 1300, easing: 'ease-in-out' });
+    await B.bekle(1300);
     B.efekt.dusus();
     B.soyle('Eyvah!');
     [...kule.children].forEach((k, n) => {

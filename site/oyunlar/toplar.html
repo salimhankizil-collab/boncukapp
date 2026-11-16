@@ -118,11 +118,12 @@
     const top = $('top');
     const a = top.getBoundingClientRect(), b = bardak.getBoundingClientRect();
     const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height * 0.12 - (a.top + a.height / 2);
-    await top.animate([
+    top.animate([
       { transform: 'translate(0,0)' },
       { transform: `translate(${dx * 0.5}px, ${Math.min(dy * 0.2, -60)}px)`, offset: 0.4 },
       { transform: `translate(${dx}px, ${dy}px) scale(.62)` },
-    ], { duration: 650, easing: 'ease-in' }).finished;
+    ], { duration: 650, easing: 'ease-in' });
+    await B.bekle(650);
     top.hidden = true;
     const ic = document.createElement('span'); ic.className = 'icindeki top3b'; ic.style.setProperty('--c', hedef.renk);
     bardak.append(ic); bardak.disabled = true;
