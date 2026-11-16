@@ -26,7 +26,7 @@
    "1f985",
    "1f42c"
   ],
-  "release": null
+  "release": "bolum-002-010"
  },
  "3": {
   "tur": "kule",
@@ -42,7 +42,7 @@
    "pink"
   ],
   "hayvanlar": [],
-  "release": null
+  "release": "bolum-002-010"
  },
  "4": {
   "tur": "toplar",
@@ -58,7 +58,7 @@
    "purple"
   ],
   "hayvanlar": [],
-  "release": null
+  "release": "bolum-002-010"
  },
  "5": {
   "tur": "golge",
@@ -71,7 +71,7 @@
    "1f408",
    "1f406"
   ],
-  "release": null
+  "release": "bolum-002-010"
  },
  "6": {
   "tur": "kule",
@@ -87,7 +87,7 @@
    "pink"
   ],
   "hayvanlar": [],
-  "release": null
+  "release": "bolum-002-010"
  },
  "7": {
   "tur": "toplar",
@@ -103,7 +103,7 @@
    "purple"
   ],
   "hayvanlar": [],
-  "release": null
+  "release": "bolum-002-010"
  },
  "8": {
   "tur": "golge",
@@ -116,7 +116,7 @@
    "1f411",
    "1f998"
   ],
-  "release": null
+  "release": "bolum-002-010"
  },
  "9": {
   "tur": "kule",
@@ -132,7 +132,7 @@
    "pink"
   ],
   "hayvanlar": [],
-  "release": null
+  "release": "bolum-002-010"
  },
  "10": {
   "tur": "toplar",
@@ -148,6 +148,6 @@
    "yellow"
   ],
   "hayvanlar": [],
-  "release": null
+  "release": "bolum-002-010"
  }
 }
