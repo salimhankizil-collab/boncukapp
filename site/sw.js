@@ -1,5 +1,5 @@
 // Çevrimdışı çalışma: oyunlar internet olmadan da açılır; video listesi her seferinde önce internetten denenir.
-const SURUM = 'boncuk-v1';
+const SURUM = 'boncuk-v2';
 const DOSYALAR = [
   './', 'index.html', 'videolar.html', 'gizlilik.html', 'ortak.css', 'ortak.js', 'videolar.js', 'oyun.css',
   'oyunlar/toplar.html', 'oyunlar/golge.html', 'oyunlar/kule.html',
