@@ -1,11 +1,11 @@
 {
  "ozet": [
   {
-   "guncelleme": "2026-11-16 11:05",
+   "guncelleme": "2026-11-16 12:38",
    "baglanti": "Bağlı",
    "otomatik_yayin": "YouTube onayı bekleniyor",
    "abone": 1,
-   "toplam_izlenme": 4,
+   "toplam_izlenme": 5,
    "dun_izlenme": 0,
    "son7_izlenme": 0,
    "son90_izlenme": 0,
@@ -19,7 +19,7 @@
  "gunluk": [
   {
    "tarih": "2026-11-16",
-   "toplam_izlenme": 4,
+   "toplam_izlenme": 5,
    "abone": 1,
    "gunluk_izlenme": null
   }
@@ -30,7 +30,7 @@
    "tur": "Renkli toplar",
    "durum": "Yayında",
    "tarih": "2026-11-16 10:12",
-   "izlenme": 4,
+   "izlenme": 5,
    "begeni": 0,
    "link": "https://youtube.com/shorts/5nh4eav306g"
   }
@@ -39,7 +39,7 @@
   {
    "tur": "Renkli toplar",
    "video": 1,
-   "ortalama_izlenme": 4
+   "ortalama_izlenme": 5
   },
   {
    "tur": "Gölge bilmecesi",
@@ -54,8 +54,8 @@
  ],
  "gorevler": [
   {
-   "gorev": "Planlı videon 0 gün sonra bitiyor. Bölüm 2–8'i YouTube Studio'dan yükle ve her gün 18:00'e birer tane planla. Dosyalar bilgisayardaki 'videolar' klasöründe. Başlık ve açıklama her bölümün yukleme_bilgisi.txt dosyasında.",
-   "link": "https://studio.youtube.com/"
+   "gorev": "Planlı videon 0 gün sonra bitiyor. Bölüm 2–8'i YouTube Studio'dan yükle ve her gün 18:00'e birer tane planla. İndir: GitHub'daki 'bolum-002-010' sayfası. Başlık ve açıklama her bölümün yukleme_bilgisi.txt dosyasında.",
+   "link": "https://github.com/salimhankizil-collab/boncukapp/releases/tag/bolum-002-010"
   }
  ]
 }
