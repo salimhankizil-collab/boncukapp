@@ -211,6 +211,12 @@ def calistir(yukleme_yok=False):
     # YouTube API kuralı: istatistikler 30 günden uzun saklanmaz, eskiler silinir
     sinir = (simdi.date() - dt.timedelta(days=SAKLAMA_GUN)).isoformat()
     gecmis = {g: v for g, v in gecmis.items() if g >= sinir}
+    # Gizlilik politikası sözü: YouTube'a 7 gündür bağlanılamıyorsa (izin geri alınmış olabilir)
+    # saklanan istatistikler ve video listesi silinir.
+    if not kanal and gecmis and max(gecmis) < (simdi.date() - dt.timedelta(days=7)).isoformat():
+        gecmis = {}
+        (SITE / "veri" / "videolar.json").unlink(missing_ok=True)
+        uyarilar.append("7 gündür YouTube'a bağlanılamadı; saklanan istatistikler silindi.")
     yaz(GECMIS, gecmis)
     gunler = sorted(gecmis)
     gunluk = []
