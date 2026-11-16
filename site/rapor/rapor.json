@@ -1,0 +1,61 @@
+{
+ "ozet": [
+  {
+   "guncelleme": "2026-11-16 11:05",
+   "baglanti": "Bağlı",
+   "otomatik_yayin": "YouTube onayı bekleniyor",
+   "abone": 1,
+   "toplam_izlenme": 4,
+   "dun_izlenme": 0,
+   "son7_izlenme": 0,
+   "son90_izlenme": 0,
+   "yayinda": 1,
+   "planli": 0,
+   "hazir_bekleyen": 9,
+   "bugun_yuklenen": 0,
+   "uyari": ""
+  }
+ ],
+ "gunluk": [
+  {
+   "tarih": "2026-11-16",
+   "toplam_izlenme": 4,
+   "abone": 1,
+   "gunluk_izlenme": null
+  }
+ ],
+ "videolar": [
+  {
+   "bolum": 1,
+   "tur": "Renkli toplar",
+   "durum": "Yayında",
+   "tarih": "2026-11-16 10:12",
+   "izlenme": 4,
+   "begeni": 0,
+   "link": "https://youtube.com/shorts/5nh4eav306g"
+  }
+ ],
+ "turler": [
+  {
+   "tur": "Renkli toplar",
+   "video": 1,
+   "ortalama_izlenme": 4
+  },
+  {
+   "tur": "Gölge bilmecesi",
+   "video": 0,
+   "ortalama_izlenme": 0
+  },
+  {
+   "tur": "Renkli kule",
+   "video": 0,
+   "ortalama_izlenme": 0
+  }
+ ],
+ "gorevler": [
+  {
+   "gorev": "Planlı videon 0 gün sonra bitiyor. Bölüm 2–8'i YouTube Studio'dan yükle ve her gün 18:00'e birer tane planla. Dosyalar bilgisayardaki 'videolar' klasöründe. Başlık ve açıklama her bölümün yukleme_bilgisi.txt dosyasında.",
+   "link": "https://studio.youtube.com/"
+  }
+ ]
+}

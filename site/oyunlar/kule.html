@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Renkli Kule · Boncuk</title>
+<meta name="theme-color" content="#2680f0">
+<meta name="sw" content="../sw.js">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../img/favicon.png">
+<link rel="stylesheet" href="../ortak.css">
+<link rel="stylesheet" href="../oyun.css">
+<style>
+  .sahne { flex: 1; min-height: 0; width: 100%; max-width: 640px; display: flex; align-items: flex-end; justify-content: center; gap: 16px; }
+  .kule { display: flex; flex-direction: column-reverse; align-items: center; gap: 3px; transform-origin: 50% 100%; }
+  #boncuk { width: clamp(90px, 22vw, 140px); margin-bottom: 0; }
+  .blok { --w: clamp(84px, 24vw, 140px); width: var(--w); height: calc(var(--w) * .42); border: 0; border-radius: 12px; cursor: pointer; padding: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--c) 70%, white), var(--c) 35%, color-mix(in srgb, var(--c) 80%, black)); box-shadow: inset 0 -6px 0 rgba(0,0,0,.15), 0 4px 0 rgba(0,0,0,.12); position: relative; }
+  .blok::after { content: "★"; position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.55); font-size: calc(var(--w) * .2); }
+  .kule .blok { --w: clamp(96px, 30vw, 170px); cursor: default; }
+  .tepsi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 520px; justify-items: center; }
+  .tepsi .blok:disabled { visibility: hidden; }
+  .zemin { width: 100%; max-width: 640px; height: 10px; border-radius: 6px; background: var(--yesil); opacity: .6; }
+</style>
+</head>
+<body>
+<div class="oyun">
+  <header class="oyun-ust">
+    <a class="yuvarlak" href="../" aria-label="Ana sayfaya dön">←</a>
+    <h1>Renkli Kule</h1>
+    <button class="yuvarlak" id="ses-dugme" type="button" aria-label="Sesi kapat" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="ses-dalga" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+  <div class="alan">
+    <div class="kelime" id="kelime" aria-live="polite"></div>
+    <div class="sahne">
+      <div class="kule" id="kule"></div>
+      <img id="boncuk" src="../img/boncuk.png" alt="Boncuk">
+    </div>
+    <div class="zemin"></div>
+    <div class="tepsi" id="tepsi"></div>
+  </div>
+</div>
+
+<div class="perde" id="baslat">
+  <div class="kutu">
+    <img src="../img/boncuk.png" alt="">
+    <h2>Söylenen rengi bul, kuleyi yap!</h2>
+    <button class="dugme turuncu" id="baslat-dugme" type="button">▶ Oyna</button>
+  </div>
+</div>
+<div class="perde" id="bitti" hidden>
+  <div class="kutu">
+    <img src="../img/boncuk-mutlu.png" alt="">
+    <h2>Eyvah, kule yıkıldı!</h2>
+    <div class="satir">
+      <button class="dugme turuncu" id="tekrar" type="button">Yeniden yap</button>
+      <a class="dugme acik" href="../#oyunlar">Diğer oyunlar</a>
+    </div>
+  </div>
+</div>
+
+<script src="../ortak.js"></script>
+<script>
+(function () {
+  const B = window.Boncuk;
+  const $ = (id) => document.getElementById(id);
+  const istenen = (B.param('renkler') || '').split(',').filter(Boolean);
+  let sira = [], i = 0, bekliyor = false;
+
+  function blok(r) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'blok'; b.style.setProperty('--c', r.renk);
+    b.setAttribute('aria-label', `${r.ad} blok`);
+    return b;
+  }
+  function kur() {
+    const secim = istenen.length >= 3 ? B.RENKLER.filter((r) => istenen.includes(r.anahtar)) : B.karistir(B.RENKLER).slice(0, 6);
+    sira = B.karistir(secim); i = 0;
+    $('kule').replaceChildren(); $('kule').style.transform = '';
+    $('boncuk').src = '../img/boncuk.png';
+    $('tepsi').replaceChildren(...B.karistir(secim).map((r) => { const b = blok(r); b.addEventListener('click', () => sec(b, r)); return b; }));
+  }
+  async function tur() {
+    const r = sira[i];
+    $('kelime').innerHTML = '';
+    const tr = document.createElement('span'); tr.textContent = r.ad.toLocaleUpperCase('tr'); tr.style.color = r.renk;
+    const en = document.createElement('small'); en.textContent = 'Find ' + r.ing.toLowerCase() + '!';
+    $('kelime').append(tr, en);
+    bekliyor = false;
+    await B.soyle(`${r.ad} bloğu bul!`);
+    await B.soyle(`Find ${r.ing.toLowerCase()}!`, 'en');
+    bekliyor = true;
+  }
+  async function sec(b, r) {
+    if (!bekliyor) return;
+    if (r.anahtar !== sira[i].anahtar) {
+      b.classList.remove('salla'); void b.offsetWidth; b.classList.add('salla');
+      B.efekt.hata(); bekliyor = false;
+      await B.soyle(`Bu ${r.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
+      bekliyor = true; return;
+    }
+    bekliyor = false;
+    b.disabled = true;
+    const yeni = blok(r); yeni.tabIndex = -1; yeni.setAttribute('aria-hidden', 'true');
+    $('kule').append(yeni);
+    yeni.animate([{ transform: 'translateY(-60vh)' }, { transform: 'translateY(0)', offset: .75 }, { transform: 'translateY(-10px)', offset: .87 }, { transform: 'translateY(0)' }], { duration: 650, easing: 'ease-in' });
+    $('boncuk').src = `../img/boncuk-${r.anahtar}.png`;
+    setTimeout(() => { B.efekt.boing(); B.efekt.ding(); }, 480);
+    await B.bekle(600);
+    await B.soyle(`${r.ad}! ${r.ing}!`);
+    i++;
+    if (i < sira.length) { tur(); return; }
+    $('kelime').textContent = '';
+    await B.soyle('Vay! Kule çok yükseldi!');
+    const kule = $('kule');
+    await kule.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-4deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(8deg)' }], { duration: 1300, easing: 'ease-in-out' }).finished;
+    B.efekt.dusus();
+    B.soyle('Eyvah!');
+    [...kule.children].forEach((k, n) => {
+      const yon = n % 2 ? 1 : -1;
+      k.animate([{ transform: 'translate(0,0) rotate(0)' }, { transform: `translate(${yon * (80 + n * 40)}px, ${40 + n * 60}px) rotate(${yon * (90 + n * 30)}deg)`, opacity: 0 }], { duration: 900 + n * 80, easing: 'cubic-bezier(.4,0,.8,.6)', fill: 'forwards' });
+    });
+    await B.bekle(1300);
+    B.efekt.tada(); B.konfeti();
+    $('boncuk').src = '../img/boncuk-mutlu.png';
+    await B.soyle('Hadi bir daha yapalım!');
+    $('bitti').hidden = false;
+  }
+
+  $('baslat-dugme').addEventListener('click', async () => {
+    B.sesiAc(); $('baslat').hidden = true; kur();
+    await B.soyle('Hadi renkli bloklarla kocaman bir kule yapalım!');
+    tur();
+  });
+  $('tekrar').addEventListener('click', () => { $('bitti').hidden = true; kur(); tur(); });
+  $('ses-dugme').addEventListener('click', (e) => {
+    B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
+    e.currentTarget.setAttribute('aria-pressed', String(B.sessiz));
+    e.currentTarget.setAttribute('aria-label', B.sessiz ? 'Sesi aç' : 'Sesi kapat');
+    $('ses-dalga').style.opacity = B.sessiz ? 0.15 : 1;
+  });
+})();
+</script>
+</body>
+</html>

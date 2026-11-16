@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boncuk Çocuk TV · Renk ve hayvan oyunları</title>
+<meta name="description" content="Boncuk ile renkleri, hayvanları ve İngilizce kelimeleri oyunlarla öğren. 2-6 yaş için reklamsız, ücretsiz eğitici oyunlar ve videolar.">
+<meta name="theme-color" content="#2680f0">
+<meta property="og:title" content="Boncuk Çocuk TV">
+<meta property="og:description" content="Renk ve hayvan oyunları, eğitici kısa videolar. Türkçe + İngilizce, reklamsız.">
+<meta property="og:image" content="img/paylasim.png">
+<meta property="og:type" content="website">
+<meta name="sw" content="sw.js">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="stylesheet" href="ortak.css">
+<style>
+  .kahraman { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: center; padding-block: 24px 12px; }
+  .kahraman h1 { font-size: clamp(2.4rem, 7vw, 4rem); font-weight: 800; }
+  .kahraman h1 span { color: var(--mavi); }
+  .kahraman p { font-size: 1.25rem; max-width: 34ch; margin: 14px 0 20px; }
+  .kahraman .dugmeler { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sahne { position: relative; display: grid; place-items: center; min-height: 320px; }
+  .sahne::before { content: ""; position: absolute; width: min(340px, 80vw); aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--kirmizi), var(--turuncu), var(--sari), var(--yesil), var(--mavi), var(--mor), var(--kirmizi)); opacity: .22; }
+  #boncuk-dugme { position: relative; border: 0; background: none; cursor: pointer; padding: 0; width: min(260px, 62vw); }
+  #boncuk-dugme img { width: 100%; animation: zipla 2.4s ease-in-out infinite; }
+  .sahne .ipucu { position: absolute; bottom: 0; font-weight: 700; color: var(--soluk); }
+  #renk-adi { position: absolute; top: 4px; font-family: var(--font-baslik); font-weight: 800; font-size: 2rem; min-height: 1.2em; }
+  @keyframes zipla { 0%, 100% { transform: translateY(0) scale(1, 1); } 45% { transform: translateY(-14px) scale(.98, 1.03); } 55% { transform: translateY(-14px); } }
+  #kur-yardim { margin-top: 12px; font-weight: 700; }
+  .oyun-kart .resim.r1 { background: #ffe1e1; } .oyun-kart .resim.r2 { background: #e2ecff; } .oyun-kart .resim.r3 { background: #fff0cf; }
+  .mini-toplar { display: flex; gap: 8px; }
+  .mini-toplar i { width: 34px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff8 0 18%, transparent 19%), var(--c); }
+  .mini-kule { display: flex; flex-direction: column-reverse; gap: 4px; }
+  .mini-kule i { width: 90px; height: 22px; border-radius: 6px; background: var(--c); }
+  .golge-resim { width: 46%; filter: brightness(0) opacity(.75); }
+  .ebeveyn { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .ebeveyn h3 { font-size: 1.25rem; margin-bottom: 6px; }
+  .ebeveyn p { margin: 0; }
+  @media (max-width: 720px) { .kahraman { grid-template-columns: 1fr; text-align: center; } .kahraman p { margin-inline: auto; } .kahraman .dugmeler { justify-content: center; } .sahne { order: -1; min-height: 260px; } }
+</style>
+</head>
+<body>
+<div class="serit"></div>
+<header class="ust">
+  <div class="kap">
+    <a class="logo" href="./"><img src="img/boncuk.png" alt="">Boncuk</a>
+    <nav class="menu" aria-label="Ana menü">
+      <a href="./" aria-current="page">Ana sayfa</a>
+      <a href="#oyunlar">Oyunlar</a>
+      <a href="videolar.html">Videolar</a>
+      <a href="#ebeveyn">Ebeveynler</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="kap kahraman">
+    <div>
+      <h1>Merhaba, ben <span>Boncuk</span>!</h1>
+      <p>Renkleri, hayvanları ve İngilizce kelimeleri oyunlarla birlikte öğrenelim.</p>
+      <div class="dugmeler">
+        <a class="dugme turuncu" href="#oyunlar">Hadi oynayalım</a>
+        <a class="dugme" href="videolar.html">Videoları izle</a>
+        <button class="dugme acik" type="button" data-kur>Telefona yükle</button>
+      </div>
+      <p id="kur-yardim" hidden></p>
+    </div>
+    <div class="sahne">
+      <span id="renk-adi" aria-live="polite"></span>
+      <button id="boncuk-dugme" type="button" aria-label="Boncuk'a dokun, rengi değişsin"><img id="boncuk-resim" src="img/boncuk.png" alt="Boncuk"></button>
+      <span class="ipucu">Boncuk'a dokun!</span>
+    </div>
+  </section>
+
+  <section class="kap bolum" id="oyunlar">
+    <h2>Oyunlar</h2>
+    <div class="izgara">
+      <a class="kart oyun-kart" href="oyunlar/toplar.html">
+        <div class="resim r1"><div class="mini-toplar"><i style="--c:var(--kirmizi)"></i><i style="--c:var(--sari)"></i><i style="--c:var(--mavi)"></i></div></div>
+        <h3>Renkli Toplar</h3>
+        <span class="soluk">Topları aynı renkteki bardağa koy.</span>
+      </a>
+      <a class="kart oyun-kart" href="oyunlar/golge.html">
+        <div class="resim r2"><img class="golge-resim" src="img/hayvan/1f992.png" alt=""></div>
+        <h3>Bu Kimin Gölgesi?</h3>
+        <span class="soluk">Gölgeye bak, hayvanı bul.</span>
+      </a>
+      <a class="kart oyun-kart" href="oyunlar/kule.html">
+        <div class="resim r3"><div class="mini-kule"><i style="--c:var(--kirmizi)"></i><i style="--c:var(--turuncu)"></i><i style="--c:var(--yesil)"></i><i style="--c:var(--mavi)"></i></div></div>
+        <h3>Renkli Kule</h3>
+        <span class="soluk">Söylenen rengi bul, kuleyi yap.</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="kap bolum" id="son-videolar">
+    <h2>Son videolar</h2>
+    <div class="izgara" id="video-listesi"><p class="soluk">Videolar yükleniyor…</p></div>
+    <p><a class="dugme acik" href="videolar.html">Tüm videolar</a></p>
+  </section>
+
+  <section class="kap bolum" id="ebeveyn">
+    <h2>Ebeveynler için</h2>
+    <div class="ebeveyn">
+      <div class="kart"><h3>Reklam ve kayıt yok</h3><p>Sitede reklam, üyelik, çerez veya takip yok. Çocuğunuzdan hiçbir bilgi istemiyoruz.</p></div>
+      <div class="kart"><h3>Türkçe + İngilizce</h3><p>Her renk ve hayvan önce Türkçe, sonra İngilizce söylenir. Oyunlar 2-6 yaş için tasarlandı.</p></div>
+      <div class="kart"><h3>Ekran süresi</h3><p>Dünya Sağlık Örgütü 2-4 yaş için günde en fazla 1 saat ekran süresi öneriyor. Oyunları birlikte oynamanızı tavsiye ederiz.</p></div>
+      <div class="kart"><h3>Videolar YouTube'da</h3><p>Her gün yeni bir kısa video <a href="https://www.youtube.com/@BoncukCocukTV" target="_blank" rel="noopener">Boncuk Çocuk TV</a> kanalında yayınlanıyor.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="alt">
+  <div class="kap">
+    <span>© 2026 Boncuk Çocuk TV</span>
+    <span><a href="gizlilik.html">Gizlilik politikası</a> · <a href="https://www.youtube.com/@BoncukCocukTV" target="_blank" rel="noopener">YouTube kanalı</a></span>
+  </div>
+</footer>
+
+<script src="ortak.js"></script>
+<script src="videolar.js"></script>
+<script>
+  videolariGoster(document.getElementById('video-listesi'), 6);
+  (function () {
+    const B = window.Boncuk;
+    const img = document.getElementById('boncuk-resim');
+    const ad = document.getElementById('renk-adi');
+    let i = -1, mesgul = false;
+    document.getElementById('boncuk-dugme').addEventListener('click', async () => {
+      if (mesgul) return; mesgul = true;
+      B.sesiAc(); B.efekt.pop();
+      i = (i + 1) % B.RENKLER.length;
+      const r = B.RENKLER[i];
+      img.src = `img/boncuk-${r.anahtar}.png`;
+      ad.textContent = `${r.ad} · ${r.ing}`; ad.style.color = r.renk;
+      await B.soyle(r.ad + '!'); await B.soyle(r.ing + '!', 'en');
+      mesgul = false;
+    });
+  })();
+</script>
+</body>
+</html>

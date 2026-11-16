@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kanal Raporu · Boncuk Çocuk TV</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2680f0">
+<link rel="icon" href="../img/favicon.png">
+<link rel="stylesheet" href="../ortak.css">
+<style>
+  .rapor { display: flex; flex-direction: column; gap: 26px; padding-block: 20px 48px; }
+  .rapor h1 { font-size: clamp(2rem, 6vw, 2.8rem); }
+  .ozet-cumle { font-size: 1.25rem; margin: 6px 0 0; max-width: 60ch; }
+  .meta { color: var(--soluk); font-size: .95rem; margin: 4px 0 0; }
+  .uyari { border: 2px solid var(--turuncu); border-radius: var(--r); padding: 14px 18px; background: var(--kart); }
+  h2 { font-size: 1.5rem; margin-bottom: 10px; }
+  .gorevler { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .gorevler li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .kutucuklar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .kutucuk .etk { color: var(--soluk); font-size: .95rem; }
+  .kutucuk .sayi { font-family: var(--font-baslik); font-weight: 800; font-size: 2.2rem; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .hedefler { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .cubuk { height: 14px; border-radius: 999px; background: var(--cizgi); overflow: hidden; margin-top: 8px; }
+  .cubuk i { display: block; height: 100%; background: linear-gradient(90deg, var(--yesil), var(--mavi)); border-radius: 999px; }
+  .grafik { position: relative; }
+  .grafik svg text { fill: var(--soluk); font-size: 12px; font-family: var(--font-govde); }
+  .tablo { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--cizgi); white-space: nowrap; }
+  th { color: var(--soluk); font-size: .9rem; }
+  td.r, th.r { text-align: right; }
+  .durum { padding: 1px 10px; border-radius: 999px; font-size: .85rem; font-weight: 700; border: 2px solid currentColor; }
+  .durum.yayinda { color: var(--yesil); } .durum.planlandi { color: var(--mavi); } .durum.gizli { color: var(--turuncu); }
+  .tur-satir { display: grid; grid-template-columns: 9.5em 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .tur-satir .cubuk { margin: 0; }
+</style>
+</head>
+<body>
+<div class="serit"></div>
+<main class="kap rapor">
+  <header>
+    <h1>Kanal Raporu</h1>
+    <p class="ozet-cumle" id="cumle">Rapor yükleniyor…</p>
+    <p class="meta" id="meta"></p>
+  </header>
+  <div class="uyari" id="uyari" hidden></div>
+  <section><h2>Bugün yapman gerekenler</h2><ul class="gorevler" id="gorevler"></ul></section>
+  <section><h2>Kanal bir bakışta</h2><div class="kutucuklar" id="kutucuklar"></div></section>
+  <section>
+    <h2>Para kazanma hedefi</h2>
+    <div class="hedefler" id="hedefler"></div>
+    <p class="meta">Shorts ile para kazanmak için iki hedefin ikisi de gerekir. 90 günlük izlenme, raporların başladığı günden bu yana biriken sayılardan hesaplanır.</p>
+  </section>
+  <section><h2>Günlük izlenme</h2><div class="grafik kart" id="grafik"></div></section>
+  <section><h2>Hangi tür daha çok izleniyor?</h2><div class="kart" id="turler"></div></section>
+  <section><h2>Videolar</h2><div class="tablo kart"><table><thead><tr><th>Bölüm</th><th>Tür</th><th>Durum</th><th>Yayın</th><th class="r">İzlenme</th><th class="r">Beğeni</th><th></th></tr></thead><tbody id="videolar"></tbody></table></div></section>
+</main>
+<script>
+(async function () {
+  const HEDEF_ABONE = 1000, HEDEF_IZLENME = 10000000;
+  const say = (v) => (v === null || v === undefined || isNaN(+v)) ? '—' : (+v).toLocaleString('tr-TR');
+  const el = (etiket, sinif, metin) => { const e = document.createElement(etiket); if (sinif) e.className = sinif; if (metin !== undefined) e.textContent = metin; return e; };
+  let r;
+  try { r = await (await fetch('rapor.json', { cache: 'no-cache' })).json(); }
+  catch (e) { document.getElementById('cumle').textContent = 'Rapor henüz oluşmadı. İlk rapor her gün 18:00 civarında gelir.'; return; }
+  const o = r.ozet[0];
+  document.getElementById('cumle').textContent = `Son raporda ${say(o.dun_izlenme)} yeni izlenme geldi. Kanalda ${say(o.abone)} abone var ve sırada ${say(o.hazir_bekleyen)} hazır video bekliyor.`;
+  document.getElementById('meta').textContent = `Son güncelleme: ${o.guncelleme} (Türkiye saati) · YouTube bağlantısı: ${o.baglanti} · Otomatik yükleme: ${o.otomatik_yayin}`;
+  if (o.uyari) { const u = document.getElementById('uyari'); u.hidden = false; u.textContent = 'Dikkat: ' + o.uyari; }
+
+  document.getElementById('gorevler').replaceChildren(...r.gorevler.map((g) => {
+    const li = el('li', 'kart'); li.append(el('span', '', g.gorev));
+    if (g.link) { const a = el('a', 'dugme acik', 'Aç ↗'); a.href = g.link; a.target = '_blank'; a.rel = 'noopener'; li.append(a); }
+    return li;
+  }));
+
+  const kutu = (etk, deger, alt) => { const k = el('div', 'kart kutucuk'); k.append(el('div', 'etk', etk), el('div', 'sayi', deger)); if (alt) k.append(el('div', 'meta', alt)); return k; };
+  document.getElementById('kutucuklar').replaceChildren(
+    kutu('Abone', say(o.abone), `Hedef: ${say(HEDEF_ABONE)}`),
+    kutu('Son raporda gelen izlenme', say(o.dun_izlenme)),
+    kutu('Son 7 gün izlenme', say(o.son7_izlenme), `Toplam: ${say(o.toplam_izlenme)}`),
+    kutu('Sırada hazır video', say(o.hazir_bekleyen)),
+    kutu('Yayında', say(o.yayinda), `${say(o.planli)} video planlandı`),
+  );
+
+  const hedef = (ad, deger, toplam) => {
+    const k = el('div', 'kart'); const yuzde = Math.min(100, deger / toplam * 100);
+    k.append(el('div', '', `${ad}: ${say(deger)} / ${say(toplam)} (%${yuzde.toLocaleString('tr-TR', { maximumFractionDigits: 2 })})`));
+    const c = el('div', 'cubuk'); const i = el('i'); i.style.width = Math.max(yuzde, deger > 0 ? 1 : 0) + '%'; c.append(i); k.append(c);
+    return k;
+  };
+  document.getElementById('hedefler').replaceChildren(hedef('Abone', o.abone, HEDEF_ABONE), hedef('Son 90 gün izlenme', o.son90_izlenme, HEDEF_IZLENME));
+
+  const gunler = r.gunluk.filter((g) => g.gunluk_izlenme !== null && g.gunluk_izlenme !== undefined);
+  const grafik = document.getElementById('grafik');
+  if (!gunler.length) grafik.textContent = 'Grafik ikinci günün raporundan itibaren dolmaya başlar.';
+  else {
+    const W = Math.max(300, grafik.clientWidth - 36), H = 200, sol = 48, alt = 24;
+    const enCok = Math.max(1, ...gunler.map((g) => g.gunluk_izlenme));
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', '100%');
+    svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'Günlük izlenme çubuk grafiği');
+    const y = (v) => H - alt - (v / enCok) * (H - alt - 10);
+    [0, 0.5, 1].forEach((k) => {
+      const l = document.createElementNS(ns, 'line'); l.setAttribute('x1', sol); l.setAttribute('x2', W); l.setAttribute('y1', y(enCok * k)); l.setAttribute('y2', y(enCok * k)); l.setAttribute('stroke', 'currentColor'); l.setAttribute('opacity', '.15'); svg.append(l);
+      const t = document.createElementNS(ns, 'text'); t.setAttribute('x', sol - 6); t.setAttribute('y', y(enCok * k) + 4); t.setAttribute('text-anchor', 'end'); t.textContent = say(Math.round(enCok * k)); svg.append(t);
+    });
+    const bw = (W - sol) / gunler.length;
+    gunler.forEach((g, n) => {
+      const rct = document.createElementNS(ns, 'rect');
+      rct.setAttribute('x', sol + n * bw + bw * 0.15); rct.setAttribute('width', bw * 0.7); rct.setAttribute('y', y(g.gunluk_izlenme)); rct.setAttribute('height', H - alt - y(g.gunluk_izlenme)); rct.setAttribute('rx', 3); rct.setAttribute('fill', '#2680f0');
+      const tt = document.createElementNS(ns, 'title'); tt.textContent = `${g.tarih}: ${say(g.gunluk_izlenme)} izlenme`; rct.append(tt); svg.append(rct);
+      if (gunler.length <= 14 || n % Math.ceil(gunler.length / 10) === 0) {
+        const t = document.createElementNS(ns, 'text'); t.setAttribute('x', sol + n * bw + bw / 2); t.setAttribute('y', H - 6); t.setAttribute('text-anchor', 'middle'); t.textContent = g.tarih.slice(8, 10) + '.' + g.tarih.slice(5, 7); svg.append(t);
+      }
+    });
+    grafik.replaceChildren(svg);
+  }
+
+  const enCokTur = Math.max(1, ...r.turler.map((t) => t.ortalama_izlenme));
+  document.getElementById('turler').replaceChildren(...r.turler.map((t) => {
+    const s = el('div', 'tur-satir'); const c = el('div', 'cubuk'); const i = el('i'); i.style.width = (t.ortalama_izlenme / enCokTur * 100) + '%'; c.append(i);
+    s.append(el('span', '', t.tur), c, el('span', '', `${say(t.ortalama_izlenme)} ort. · ${t.video} video`));
+    return s;
+  }));
+
+  const tb = document.getElementById('videolar');
+  if (!r.videolar.length) { const tr = el('tr'); const td = el('td', '', 'Henüz video yok.'); td.colSpan = 7; tr.append(td); tb.append(tr); }
+  r.videolar.forEach((v) => {
+    const tr = el('tr');
+    const d = el('td'); d.append(el('span', 'durum ' + ({ 'Yayında': 'yayinda', 'Planlandı': 'planlandi' }[v.durum] || 'gizli'), v.durum));
+    const l = el('td'); const a = el('a', '', 'İzle ↗'); a.href = v.link; a.target = '_blank'; a.rel = 'noopener'; l.append(a);
+    tr.append(el('td', '', v.bolum ?? '—'), el('td', '', v.tur), d, el('td', '', v.tarih || '—'), el('td', 'r', say(v.izlenme)), el('td', 'r', say(v.begeni)), l);
+    tb.append(tr);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bu Kimin Gölgesi? · Boncuk</title>
+<meta name="theme-color" content="#2680f0">
+<meta name="sw" content="../sw.js">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../img/favicon.png">
+<link rel="stylesheet" href="../ortak.css">
+<link rel="stylesheet" href="../oyun.css">
+<style>
+  .isik { position: relative; width: min(64vw, 40vh, 360px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, #fff8dc 0 55%, rgba(255, 248, 220, 0) 72%); }
+  #hayvan { width: 74%; transition: filter .35s ease; }
+  #hayvan.golge { filter: brightness(0) opacity(.85); }
+  .secenekler { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 3vw, 18px); width: 100%; max-width: 560px; }
+  .secenek { border: 0; background: var(--kart); border-radius: 22px; box-shadow: var(--golge); padding: 10px; cursor: pointer; aspect-ratio: 1; display: grid; place-items: center; }
+  .secenek img { width: 82%; }
+  .secenek:active { transform: translateY(3px); }
+  .bilgi { font-weight: 700; text-align: center; max-width: 36ch; min-height: 3em; margin: 0; }
+</style>
+</head>
+<body>
+<div class="oyun">
+  <header class="oyun-ust">
+    <a class="yuvarlak" href="../" aria-label="Ana sayfaya dön">←</a>
+    <h1>Bu Kimin Gölgesi?</h1>
+    <button class="yuvarlak" id="ses-dugme" type="button" aria-label="Sesi kapat" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="ses-dalga" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+  <div class="alan">
+    <div class="ilerleme" id="ilerleme" aria-hidden="true"></div>
+    <div class="isik"><img id="hayvan" class="golge" alt="Gizli hayvanın gölgesi"></div>
+    <div class="kelime" id="kelime" aria-live="polite"></div>
+    <p class="bilgi" id="bilgi"></p>
+    <div class="secenekler" id="secenekler"></div>
+  </div>
+</div>
+
+<div class="perde" id="baslat">
+  <div class="kutu">
+    <img src="../img/boncuk.png" alt="">
+    <h2>Gölgeye bak, hayvanı bul!</h2>
+    <button class="dugme turuncu" id="baslat-dugme" type="button">▶ Oyna</button>
+  </div>
+</div>
+<div class="perde" id="bitti" hidden>
+  <div class="kutu">
+    <img src="../img/boncuk-mutlu.png" alt="">
+    <h2>Hepsini buldun!</h2>
+    <div class="satir">
+      <button class="dugme turuncu" id="tekrar" type="button">Bir daha oyna</button>
+      <a class="dugme acik" href="../#oyunlar">Diğer oyunlar</a>
+    </div>
+  </div>
+</div>
+
+<script src="../ortak.js"></script>
+<script>
+(function () {
+  const B = window.Boncuk;
+  const $ = (id) => document.getElementById(id);
+  const istenen = (B.param('hayvanlar') || '').split(',').filter(Boolean);
+  let tum = [], sira = [], i = 0, bekliyor = false;
+  const resim = (h) => `../img/hayvan/${h.kod}.png`;
+  const kucuk = (s) => s.toLocaleLowerCase('tr');
+
+  async function veriYukle() {
+    if (tum.length) return;
+    tum = await (await fetch('../veri/hayvanlar.json')).json();
+  }
+  function kur() {
+    const secili = istenen.length ? tum.filter((h) => istenen.includes(h.kod)) : [];
+    sira = secili.length ? B.karistir(secili) : B.karistir(tum).slice(0, 5);
+    i = 0;
+    $('ilerleme').replaceChildren(...sira.map(() => document.createElement('i')));
+  }
+  async function tur() {
+    const h = sira[i];
+    const img = $('hayvan');
+    img.classList.add('golge'); img.src = resim(h);
+    img.animate([{ transform: 'translateX(-60vw)' }, { transform: 'translateX(0)' }], { duration: 450, easing: 'cubic-bezier(.2,.9,.3,1.2)' });
+    $('kelime').textContent = '?'; $('bilgi').textContent = '';
+    const digerleri = B.karistir(tum.filter((x) => x.kod !== h.kod)).slice(0, 2);
+    $('secenekler').replaceChildren(...B.karistir([h, ...digerleri]).map((x) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'secenek'; b.setAttribute('aria-label', x.ad);
+      const im = document.createElement('img'); im.src = resim(x); im.alt = '';
+      b.append(im);
+      b.addEventListener('click', () => sec(b, x));
+      return b;
+    }));
+    B.efekt.pop();
+    bekliyor = false;
+    await B.soyle(i === 0 ? 'Bu kimin gölgesi?' : (i === sira.length - 1 ? 'Son soru! Bu kimin gölgesi?' : 'Peki bu kimin gölgesi?'));
+    await B.soyle(h.ipucu);
+    bekliyor = true;
+  }
+  async function sec(dugme, x) {
+    if (!bekliyor) return;
+    const h = sira[i];
+    if (x.kod !== h.kod) {
+      dugme.classList.remove('salla'); void dugme.offsetWidth; dugme.classList.add('salla');
+      B.efekt.hata(); bekliyor = false;
+      await B.soyle(`Bu bir ${kucuk(x.ad)}. Tekrar dene!`);
+      bekliyor = true; return;
+    }
+    bekliyor = false;
+    const img = $('hayvan');
+    img.classList.remove('golge'); img.classList.add('hopla');
+    setTimeout(() => img.classList.remove('hopla'), 600);
+    B.efekt.tada(); B.konfeti(40);
+    $('kelime').innerHTML = '';
+    const tr = document.createElement('span'); tr.textContent = h.ad.toLocaleUpperCase('tr'); tr.style.color = 'var(--kirmizi)';
+    const en = document.createElement('small'); en.textContent = h.ing.charAt(0).toUpperCase() + h.ing.slice(1);
+    $('kelime').append(tr, en);
+    $('ilerleme').children[i].classList.add('tamam');
+    await B.soyle(`Bu bir ${kucuk(h.ad)}!`);
+    await B.soyle(en.textContent + '!', 'en');
+    $('bilgi').textContent = h.bilgi;
+    await B.soyle(h.bilgi);
+    await B.bekle(500);
+    i++;
+    if (i < sira.length) { tur(); return; }
+    await B.soyle('Süpersin! Hepsini buldun!');
+    $('bitti').hidden = false;
+  }
+
+  $('baslat-dugme').addEventListener('click', async () => {
+    B.sesiAc(); $('baslat').hidden = true;
+    try { await veriYukle(); } catch (e) { $('bilgi').textContent = 'Hayvanlar yüklenemedi. İnternet bağlantını kontrol et.'; return; }
+    kur(); tur();
+  });
+  $('tekrar').addEventListener('click', () => { $('bitti').hidden = true; kur(); tur(); });
+  $('ses-dugme').addEventListener('click', (e) => {
+    B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
+    e.currentTarget.setAttribute('aria-pressed', String(B.sessiz));
+    e.currentTarget.setAttribute('aria-label', B.sessiz ? 'Sesi aç' : 'Sesi kapat');
+    $('ses-dalga').style.opacity = B.sessiz ? 0.15 : 1;
+  });
+})();
+</script>
+</body>
+</html>

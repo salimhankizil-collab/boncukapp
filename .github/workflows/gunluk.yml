@@ -1,0 +1,76 @@
+name: Günlük Boncuk işi
+
+on:
+  schedule:
+    - cron: "30 14 * * *"   # her gün 17:30 (Türkiye saati = UTC+3)
+  workflow_dispatch: {}      # GitHub'da "Run workflow" ile elle başlatılabilir
+  push:
+    branches: [main]
+    paths: ["site/**"]       # site değişince sadece siteyi yeniden yayınla
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: gunluk
+  cancel-in-progress: false
+
+jobs:
+  calis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: github-pages
+      url: ${{ steps.yayin.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Kütüphaneleri kur
+        run: pip install -r requirements.txt
+
+      - name: Seslendirme önbelleği
+        uses: actions/cache@v4
+        with:
+          path: uretim/onbellek
+          key: tts-${{ github.run_id }}
+          restore-keys: tts-
+
+      - name: Gizli anahtarları yerleştir
+        if: github.event_name != 'push'
+        env:
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_TOKEN: ${{ secrets.GOOGLE_TOKEN }}
+        run: |
+          mkdir -p gizli
+          if [ -n "$GOOGLE_CLIENT_SECRET" ]; then printf '%s' "$GOOGLE_CLIENT_SECRET" > gizli/client_secret.json; fi
+          if [ -n "$GOOGLE_TOKEN" ]; then printf '%s' "$GOOGLE_TOKEN" > gizli/token.json; fi
+
+      - name: Günlük iş (üretim, yükleme, istatistik, rapor)
+        if: github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python uretim/gunluk.py
+
+      - name: Durumu kaydet
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "boncuk-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add veri/*.json uretim/durum.json site/veri site/rapor
+          git diff --cached --quiet || git commit -m "Günlük rapor $(date -u +%F)"
+          git pull --rebase --autostash
+          git push
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: yayin
+        uses: actions/deploy-pages@v4

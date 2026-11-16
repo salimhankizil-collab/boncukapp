@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Renkli Toplar · Boncuk</title>
+<meta name="theme-color" content="#2680f0">
+<meta name="sw" content="../sw.js">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../img/favicon.png">
+<link rel="stylesheet" href="../ortak.css">
+<link rel="stylesheet" href="../oyun.css">
+<style>
+  .ust-alan { position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+  #boncuk { width: clamp(110px, 26vw, 170px); transition: transform .2s; }
+  #top { width: clamp(70px, 17vw, 100px); aspect-ratio: 1; align-self: flex-start; }
+  .bardaklar { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: clamp(6px, 2vw, 16px); width: 100%; max-width: 760px; }
+  .bardak { position: relative; border: 0; background: none; padding: 0; cursor: pointer; aspect-ratio: 3 / 4; display: flex; align-items: flex-end; justify-content: center; }
+  .bardak .govde { width: 100%; height: 82%; clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%); background: linear-gradient(90deg, color-mix(in srgb, var(--c) 75%, black), var(--c) 30%, color-mix(in srgb, var(--c) 60%, white) 45%, var(--c) 65%, color-mix(in srgb, var(--c) 75%, black)); border-radius: 0 0 12px 12px; }
+  .bardak .agiz { position: absolute; top: 12%; left: 0; right: 0; height: 14%; border-radius: 50%; background: color-mix(in srgb, var(--c) 50%, black); border: 4px solid color-mix(in srgb, var(--c) 55%, white); }
+  .bardak .icindeki { position: absolute; top: 0; left: 50%; width: 62%; aspect-ratio: 1; transform: translateX(-50%); }
+  .bardak:disabled { cursor: default; }
+</style>
+</head>
+<body>
+<div class="oyun">
+  <header class="oyun-ust">
+    <a class="yuvarlak" href="../" aria-label="Ana sayfaya dön">←</a>
+    <h1>Renkli Toplar</h1>
+    <button class="yuvarlak" id="ses-dugme" type="button" aria-label="Sesi kapat" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="ses-dalga" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+  <div class="alan">
+    <div class="ilerleme" id="ilerleme" aria-hidden="true"></div>
+    <div class="ust-alan">
+      <img id="boncuk" src="../img/boncuk.png" alt="Boncuk">
+      <div id="top" class="top3b" style="--c:#2680f0" hidden></div>
+    </div>
+    <div class="kelime" id="kelime" aria-live="polite"></div>
+    <div class="bardaklar" id="bardaklar"></div>
+  </div>
+</div>
+
+<div class="perde" id="baslat">
+  <div class="kutu">
+    <img src="../img/boncuk.png" alt="">
+    <h2>Topları bardağına koy!</h2>
+    <button class="dugme turuncu" id="baslat-dugme" type="button">▶ Oyna</button>
+  </div>
+</div>
+<div class="perde" id="bitti" hidden>
+  <div class="kutu">
+    <img src="../img/boncuk-mutlu.png" alt="">
+    <h2>Yaşasın!</h2>
+    <div class="satir">
+      <button class="dugme turuncu" id="tekrar" type="button">Bir daha oyna</button>
+      <a class="dugme acik" href="../#oyunlar">Diğer oyunlar</a>
+    </div>
+  </div>
+</div>
+
+<script src="../ortak.js"></script>
+<script>
+(function () {
+  const B = window.Boncuk;
+  const $ = (id) => document.getElementById(id);
+  const istenen = (B.param('renkler') || '').split(',').filter(Boolean);
+  let renkler, sira, i, bekliyor = false;
+
+  function kur() {
+    const secim = istenen.length >= 3 ? B.RENKLER.filter((r) => istenen.includes(r.anahtar)) : B.karistir(B.RENKLER).slice(0, 6);
+    renkler = secim;
+    sira = B.karistir(secim);
+    i = 0;
+    const kutu = $('bardaklar');
+    kutu.style.setProperty('--n', secim.length);
+    kutu.replaceChildren(...B.karistir(secim).map((r) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'bardak'; b.style.setProperty('--c', r.renk); b.dataset.renk = r.anahtar;
+      b.setAttribute('aria-label', `${r.ad} bardak`);
+      b.innerHTML = '<span class="govde"></span><span class="agiz"></span>';
+      b.addEventListener('click', () => sec(b, r));
+      return b;
+    }));
+    $('ilerleme').replaceChildren(...secim.map(() => document.createElement('i')));
+  }
+
+  async function tur() {
+    const r = sira[i];
+    const top = $('top');
+    top.hidden = false; top.style.setProperty('--c', r.renk);
+    top.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-out' });
+    $('boncuk').src = `../img/boncuk-${r.anahtar}.png`;
+    $('kelime').innerHTML = '';
+    const tr = document.createElement('span'); tr.textContent = r.ad.toLocaleUpperCase('tr'); tr.style.color = r.renk;
+    const en = document.createElement('small'); en.textContent = r.ing;
+    $('kelime').append(tr, en);
+    B.efekt.pop();
+    bekliyor = false;
+    await B.soyle(r.ad + '!');
+    await B.soyle(r.ing + '!', 'en');
+    bekliyor = true;
+  }
+
+  async function sec(bardak, r) {
+    if (!bekliyor) return;
+    const hedef = sira[i];
+    if (r.anahtar !== hedef.anahtar) {
+      bardak.classList.remove('salla'); void bardak.offsetWidth; bardak.classList.add('salla');
+      B.efekt.hata();
+      bekliyor = false;
+      await B.soyle(`Bu ${r.ad.toLocaleLowerCase('tr')}. Tekrar dene!`);
+      bekliyor = true;
+      return;
+    }
+    bekliyor = false;
+    const top = $('top');
+    const a = top.getBoundingClientRect(), b = bardak.getBoundingClientRect();
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height * 0.12 - (a.top + a.height / 2);
+    await top.animate([
+      { transform: 'translate(0,0)' },
+      { transform: `translate(${dx * 0.5}px, ${Math.min(dy * 0.2, -60)}px)`, offset: 0.4 },
+      { transform: `translate(${dx}px, ${dy}px) scale(.62)` },
+    ], { duration: 650, easing: 'ease-in' }).finished;
+    top.hidden = true;
+    const ic = document.createElement('span'); ic.className = 'icindeki top3b'; ic.style.setProperty('--c', hedef.renk);
+    bardak.append(ic); bardak.disabled = true;
+    bardak.classList.add('hopla');
+    B.efekt.boing(); setTimeout(B.efekt.ding, 80);
+    $('ilerleme').children[i].classList.add('tamam');
+    i++;
+    if (i < sira.length) { await B.bekle(450); tur(); return; }
+    await B.bekle(400);
+    B.efekt.tada(); B.konfeti();
+    $('boncuk').src = '../img/boncuk-mutlu.png';
+    await B.soyle('Yaşasın! Bütün renkleri buldun!');
+    $('bitti').hidden = false;
+  }
+
+  $('baslat-dugme').addEventListener('click', async () => {
+    B.sesiAc(); $('baslat').hidden = true; kur();
+    await B.soyle('Hadi topları renklerine göre bardaklara koyalım!');
+    tur();
+  });
+  $('tekrar').addEventListener('click', () => { $('bitti').hidden = true; kur(); tur(); });
+  $('ses-dugme').addEventListener('click', (e) => {
+    B.sessiz = !B.sessiz; if (B.sessiz) B.sustur();
+    e.currentTarget.setAttribute('aria-pressed', String(B.sessiz));
+    e.currentTarget.setAttribute('aria-label', B.sessiz ? 'Sesi aç' : 'Sesi kapat');
+    $('ses-dalga').style.opacity = B.sessiz ? 0.15 : 1;
+  });
+})();
+</script>
+</body>
+</html>

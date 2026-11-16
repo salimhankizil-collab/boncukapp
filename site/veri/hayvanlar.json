@@ -1,0 +1,331 @@
+[
+ {
+  "kod": "1f418",
+  "ad": "Fil",
+  "ing": "elephant",
+  "ipucu": "Kocaman kulakları ve uzun bir hortumu var!",
+  "bilgi": "Fil, karada yaşayan en büyük hayvandır."
+ },
+ {
+  "kod": "1f992",
+  "ad": "Zürafa",
+  "ing": "giraffe",
+  "ipucu": "Boynu çok ama çok uzun!",
+  "bilgi": "Zürafa, dünyanın en uzun boylu hayvanıdır."
+ },
+ {
+  "kod": "1f407",
+  "ad": "Tavşan",
+  "ing": "rabbit",
+  "ipucu": "Hop hop zıplar, havuç sever!",
+  "bilgi": "Tavşanların dişleri hiç durmadan uzar."
+ },
+ {
+  "kod": "1f408",
+  "ad": "Kedi",
+  "ing": "cat",
+  "ipucu": "Miyav der, yumak ile oynar!",
+  "bilgi": "Kediler günün büyük bölümünü uyuyarak geçirir."
+ },
+ {
+  "kod": "1f415",
+  "ad": "Köpek",
+  "ing": "dog",
+  "ipucu": "Hav hav der, kuyruğunu sallar!",
+  "bilgi": "Köpekler kokuları bizden çok daha iyi alır."
+ },
+ {
+  "kod": "1f40e",
+  "ad": "At",
+  "ing": "horse",
+  "ipucu": "Dörtnala koşar, yelesi uçuşur!",
+  "bilgi": "Atlar ayakta durarak uyuyabilir."
+ },
+ {
+  "kod": "1f404",
+  "ad": "İnek",
+  "ing": "cow",
+  "ipucu": "Möö der, bize süt verir!",
+  "bilgi": "İneklerin midesi dört bölümden oluşur."
+ },
+ {
+  "kod": "1f411",
+  "ad": "Koyun",
+  "ing": "sheep",
+  "ipucu": "Meee der, yumuşacık yünü var!",
+  "bilgi": "Koyunların yününden sıcacık kazaklar yapılır."
+ },
+ {
+  "kod": "1f413",
+  "ad": "Horoz",
+  "ing": "rooster",
+  "ipucu": "Sabah erkenden ü-ürü-üüü diye öter!",
+  "bilgi": "Horozun başındaki kırmızı süse ibik denir."
+ },
+ {
+  "kod": "1f986",
+  "ad": "Ördek",
+  "ing": "duck",
+  "ipucu": "Vak vak der, gölde yüzer!",
+  "bilgi": "Ördeklerin perdeli ayakları yüzmelerine yardım eder."
+ },
+ {
+  "kod": "1f989",
+  "ad": "Baykuş",
+  "ing": "owl",
+  "ipucu": "Geceleri uyanıktır, hu hu der!",
+  "bilgi": "Baykuşlar başlarını arkaya doğru çok fazla çevirebilir."
+ },
+ {
+  "kod": "1f427",
+  "ad": "Penguen",
+  "ing": "penguin",
+  "ipucu": "Buzların üstünde paytak paytak yürür!",
+  "bilgi": "Penguenler uçamaz ama çok iyi yüzer."
+ },
+ {
+  "kod": "1f422",
+  "ad": "Kaplumbağa",
+  "ing": "turtle",
+  "ipucu": "Evini sırtında taşır!",
+  "bilgi": "Kaplumbağalar tehlikede kabuklarının içine saklanır."
+ },
+ {
+  "kod": "1f40c",
+  "ad": "Salyangoz",
+  "ing": "snail",
+  "ipucu": "Çok yavaş ilerler, kabuğu kıvrım kıvrım!",
+  "bilgi": "Salyangozlar ilerlerken arkalarında parlak bir iz bırakır."
+ },
+ {
+  "kod": "1f98b",
+  "ad": "Kelebek",
+  "ing": "butterfly",
+  "ipucu": "Rengarenk kanatları var, çiçek çiçek gezer!",
+  "bilgi": "Kelebekler önce tırtıl olarak hayata başlar."
+ },
+ {
+  "kod": "1f980",
+  "ad": "Yengeç",
+  "ing": "crab",
+  "ipucu": "Yan yan yürür, kıskaçları var!",
+  "bilgi": "Yengeçler genellikle yana doğru yürür."
+ },
+ {
+  "kod": "1f419",
+  "ad": "Ahtapot",
+  "ing": "octopus",
+  "ipucu": "Denizde yaşar, bir sürü kolu var!",
+  "bilgi": "Ahtapotların tam sekiz kolu vardır."
+ },
+ {
+  "kod": "1f42c",
+  "ad": "Yunus",
+  "ing": "dolphin",
+  "ipucu": "Denizde zıplar, çok zekidir!",
+  "bilgi": "Yunuslar birbirleriyle ıslık gibi seslerle anlaşır."
+ },
+ {
+  "kod": "1f40b",
+  "ad": "Balina",
+  "ing": "whale",
+  "ipucu": "Denizin dev yüzücüsü!",
+  "bilgi": "Mavi balina, dünyanın en büyük hayvanıdır."
+ },
+ {
+  "kod": "1f988",
+  "ad": "Köpek balığı",
+  "ing": "shark",
+  "ipucu": "Denizde yaşar, sivri yüzgeci var!",
+  "bilgi": "Köpek balıklarının dişi düşünce yerine yenisi çıkar."
+ },
+ {
+  "kod": "1f42b",
+  "ad": "Deve",
+  "ing": "camel",
+  "ipucu": "Çölde yaşar, sırtında hörgüç var!",
+  "bilgi": "Develer uzun süre su içmeden yaşayabilir."
+ },
+ {
+  "kod": "1f993",
+  "ad": "Zebra",
+  "ing": "zebra",
+  "ipucu": "Siyah beyaz çizgileri var!",
+  "bilgi": "Her zebranın çizgileri birbirinden farklıdır."
+ },
+ {
+  "kod": "1f998",
+  "ad": "Kanguru",
+  "ing": "kangaroo",
+  "ipucu": "Kocaman zıplar, karnında cebi var!",
+  "bilgi": "Kangurular yavrularını karınlarındaki kesede taşır."
+ },
+ {
+  "kod": "1f994",
+  "ad": "Kirpi",
+  "ing": "hedgehog",
+  "ipucu": "Sırtı diken diken!",
+  "bilgi": "Kirpiler korkunca top gibi kıvrılır."
+ },
+ {
+  "kod": "1f43f",
+  "ad": "Sincap",
+  "ing": "squirrel",
+  "ipucu": "Ağaçta yaşar, fındık fıstık toplar!",
+  "bilgi": "Sincaplar kış için yiyecek saklar."
+ },
+ {
+  "kod": "1f99c",
+  "ad": "Papağan",
+  "ing": "parrot",
+  "ipucu": "Rengarenk tüyleri var, konuşabilir!",
+  "bilgi": "Bazı papağanlar duydukları sözleri taklit edebilir."
+ },
+ {
+  "kod": "1f9a9",
+  "ad": "Flamingo",
+  "ing": "flamingo",
+  "ipucu": "Pembe renklidir, tek ayak üstünde durur!",
+  "bilgi": "Flamingolar pembe rengini yedikleri yiyeceklerden alır."
+ },
+ {
+  "kod": "1f41d",
+  "ad": "Arı",
+  "ing": "bee",
+  "ipucu": "Vızz vızz uçar, bal yapar!",
+  "bilgi": "Arılar çiçeklerden topladıkları nektardan bal yapar."
+ },
+ {
+  "kod": "1f41e",
+  "ad": "Uğur böceği",
+  "ing": "ladybug",
+  "ipucu": "Kırmızı sırtında siyah benekler var!",
+  "bilgi": "Uğur böcekleri bitkilere zarar veren küçük böcekleri yer."
+ },
+ {
+  "kod": "1f996",
+  "ad": "Dinozor",
+  "ing": "dinosaur",
+  "ipucu": "Çok çok eskiden yaşamış, kocaman dişleri var!",
+  "bilgi": "Dinozorlar milyonlarca yıl önce yaşamıştır."
+ },
+ {
+  "kod": "1f412",
+  "ad": "Maymun",
+  "ing": "monkey",
+  "ipucu": "Ağaçtan ağaca atlar, muz sever!",
+  "bilgi": "Maymunlar kuyruklarıyla dallara tutunabilir."
+ },
+ {
+  "kod": "1f405",
+  "ad": "Kaplan",
+  "ing": "tiger",
+  "ipucu": "Turuncu tüyleri üstünde siyah çizgiler var!",
+  "bilgi": "Kaplanlar suyu sever ve çok iyi yüzer."
+ },
+ {
+  "kod": "1f98c",
+  "ad": "Geyik",
+  "ing": "deer",
+  "ipucu": "Başında dal gibi boynuzları var!",
+  "bilgi": "Erkek geyiklerin boynuzları her yıl düşer ve yeniden çıkar."
+ },
+ {
+  "kod": "1f98f",
+  "ad": "Gergedan",
+  "ing": "rhino",
+  "ipucu": "Burnunun üstünde boynuzu var!",
+  "bilgi": "Gergedanın boynuzu, tırnaklarımızla aynı maddeden yapılmıştır."
+ },
+ {
+  "kod": "1f99b",
+  "ad": "Su aygırı",
+  "ing": "hippo",
+  "ipucu": "Kocaman ağzı var, suda serinler!",
+  "bilgi": "Su aygırları günün çoğunu suyun içinde geçirir."
+ },
+ {
+  "kod": "1f40a",
+  "ad": "Timsah",
+  "ing": "crocodile",
+  "ipucu": "Uzun ağzında sivri dişleri var!",
+  "bilgi": "Timsahlar suyun içinde saatlerce hareketsiz bekleyebilir."
+ },
+ {
+  "kod": "1f985",
+  "ad": "Kartal",
+  "ing": "eagle",
+  "ipucu": "Gökyüzünde süzülür, gözleri çok keskin!",
+  "bilgi": "Kartallar çok uzaktaki şeyleri bile görebilir."
+ },
+ {
+  "kod": "1f9a2",
+  "ad": "Kuğu",
+  "ing": "swan",
+  "ipucu": "Gölde süzülür, uzun zarif bir boynu var!",
+  "bilgi": "Yavru kuğular gri tüylerle doğar."
+ },
+ {
+  "kod": "1f99a",
+  "ad": "Tavus kuşu",
+  "ing": "peacock",
+  "ipucu": "Kuyruğunu yelpaze gibi açar!",
+  "bilgi": "Rengarenk kuyruğu olan, erkek tavus kuşudur."
+ },
+ {
+  "kod": "1f9a5",
+  "ad": "Tembel hayvan",
+  "ing": "sloth",
+  "ipucu": "Ağaçta baş aşağı asılı durur, çok yavaştır!",
+  "bilgi": "Tembel hayvanlar ağaçlarda baş aşağı uyuyabilir."
+ },
+ {
+  "kod": "1f9a6",
+  "ad": "Su samuru",
+  "ing": "otter",
+  "ipucu": "Sırt üstü yüzer, çok oyunbazdır!",
+  "bilgi": "Su samurları uyurken birbirlerinin elini tutar."
+ },
+ {
+  "kod": "1f401",
+  "ad": "Fare",
+  "ing": "mouse",
+  "ipucu": "Minicik, peynir sever, cik cik der!",
+  "bilgi": "Fareler çok küçük deliklerden geçebilir."
+ },
+ {
+  "kod": "1f987",
+  "ad": "Yarasa",
+  "ing": "bat",
+  "ipucu": "Geceleri uçar, gündüz baş aşağı uyur!",
+  "bilgi": "Yarasalar, gerçekten uçabilen tek memeli hayvandır."
+ },
+ {
+  "kod": "1f41c",
+  "ad": "Karınca",
+  "ing": "ant",
+  "ipucu": "Minicik ama çok çalışkan!",
+  "bilgi": "Karıncalar kendilerinden çok daha ağır yükler taşıyabilir."
+ },
+ {
+  "kod": "1f98d",
+  "ad": "Goril",
+  "ing": "gorilla",
+  "ipucu": "Çok güçlüdür, göğsünü yumruklar!",
+  "bilgi": "Goriller çok güçlüdür ama çoğunlukla bitki yer."
+ },
+ {
+  "kod": "1f406",
+  "ad": "Leopar",
+  "ing": "leopard",
+  "ipucu": "Benekli tüyleri var, ağaca tırmanır!",
+  "bilgi": "Leoparlar ağaçlara çok iyi tırmanır."
+ },
+ {
+  "kod": "1f40d",
+  "ad": "Yılan",
+  "ing": "snake",
+  "ipucu": "Ayakları yok, tıss diye ses çıkarır!",
+  "bilgi": "Yılanlar büyüdükçe eski derilerini değiştirir."
+ }
+]

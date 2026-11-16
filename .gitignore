@@ -1,0 +1,15 @@
+# Gizli anahtarlar: ASLA GitHub'a gitmesin
+gizli/
+*.json.bak
+
+# Büyük / geçici dosyalar
+videolar/
+uretim/onbellek/
+uretim/__pycache__/
+__pycache__/
+*.pyc
+veri/gunluk.log
+veri/dashboard/
+veri/boncuk_otomasyon_sayfasi.html
+*.wav
+*.mp4

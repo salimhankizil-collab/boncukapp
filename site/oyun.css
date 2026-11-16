@@ -1,0 +1,28 @@
+/* Oyun ekranları: tam ekran, büyük dokunma alanları */
+html, body { height: 100%; }
+body { overflow: hidden; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.oyun { height: 100%; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.oyun-ust { display: flex; align-items: center; gap: 10px; padding-block: 10px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+.oyun-ust h1 { flex: 1; font-size: clamp(1.3rem, 4.5vw, 2rem); text-align: center; }
+.yuvarlak { width: 52px; height: 52px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--kart); color: var(--yazi); box-shadow: var(--golge); text-decoration: none; font-size: 1.5rem; font-weight: 800; cursor: pointer; flex: none; }
+.yuvarlak svg { width: 26px; height: 26px; }
+.alan { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 8px; padding-block: 8px 18px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+.kelime { font-family: var(--font-baslik); font-weight: 800; font-size: clamp(1.8rem, 7vw, 3rem); min-height: 1.3em; text-align: center; line-height: 1.1; }
+.kelime small { display: block; font-size: .55em; color: var(--soluk); }
+.ilerleme { display: flex; gap: 6px; justify-content: center; }
+.ilerleme i { width: 14px; height: 14px; border-radius: 50%; background: var(--cizgi); }
+.ilerleme i.tamam { background: var(--yesil); }
+
+.perde { position: fixed; inset: 0; background: color-mix(in srgb, var(--gok) 88%, transparent); display: grid; place-items: center; z-index: 40; padding: 24px; }
+.perde .kutu { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.perde img { width: min(220px, 50vw); }
+.perde h2 { font-size: clamp(2rem, 8vw, 3rem); }
+.perde .dugme { font-size: 1.4rem; padding: 16px 34px; }
+.perde .satir { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+.salla { animation: salla .45s; }
+@keyframes salla { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-10px) rotate(-3deg); } 40% { transform: translateX(10px) rotate(3deg); } 60% { transform: translateX(-6px); } 80% { transform: translateX(6px); } }
+.hopla { animation: hopla .5s; }
+@keyframes hopla { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+.top3b { border-radius: 50%; background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.85) 0 9%, transparent 10%), radial-gradient(circle at 38% 34%, color-mix(in srgb, var(--c) 55%, white), var(--c) 55%, color-mix(in srgb, var(--c) 70%, black)); box-shadow: 0 8px 14px rgba(0,0,0,.15); }
