@@ -10,7 +10,7 @@
 Her gün 17:30'da (Türkiye saati) GitHub Actions `uretim/gunluk.py` dosyasını çalıştırır:
 
 1. Yüklenmemiş bölüm 7'den azsa yeni videolar üretir (`uretim/motor.py`, `uretim/uret.py`).
-2. YouTube API incelemesi onaylıysa (`veri/ayarlar.json` → `denetim_onayli: true`) videoları yükleyip 18:00'e planlar.
+2. Otomatik yükleme açıksa (`veri/ayarlar.json` → `denetim_onayli: true`) sıradaki videoları yükleyip 18:00'e planlar (her zaman ~2 gün ileriye).
    Onaylı değilse yeni bölümleri indirilebilir bir GitHub Release olarak koyar.
 3. Kanal istatistiklerini toplar, `site/rapor/` ve `site/veri/videolar.json` dosyalarını günceller.
 4. Siteyi GitHub Pages'e yayınlar.

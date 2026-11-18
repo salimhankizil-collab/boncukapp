@@ -11,20 +11,16 @@
 
 ## Her şey bulutta çalışır
 
-Her gün 17:30'da GitHub kendisi çalışır. **Bilgisayarının ve Claude'un açık olması gerekmez.**
-1. Yüklenmemiş bölüm 7'den azsa yeni videolar üretir.
-2. YouTube istatistiklerini okur, raporu ve sitedeki video listesini günceller.
-3. YouTube onayı geldikten sonra videoları kendisi yükleyip 18:00'e planlar.
+Her gün akşam GitHub kendisi çalışır. **Bilgisayarının ve Claude'un açık olması gerekmez.**
+1. Yüklenmemiş bölüm 7'den azsa yeni videolar üretir (her iki videodan biri Boncuk, Pamuk ve Minik hikâyesi).
+2. Sıradaki videoları YouTube'a "çocuklara özel" olarak yükler ve her birini sırayla bir sonraki günün 18:00'ine planlar.
+3. YouTube istatistiklerini okur, raporu ve sitedeki video listesini günceller.
 
 ## Senin işin
 
-**YouTube onayı gelene kadar (haftada bir, ~10 dakika):**
-1. Raporu aç. "Bugün yapman gerekenler" bölümü hangi bölümleri yükleyeceğini söyler.
-2. Bölümleri indirme sayfasından indir.
-3. YouTube Studio'dan yükle, `yukleme_bilgisi.txt` dosyasındaki başlık ve açıklamayı yapıştır, Kitle: **Evet, çocuklara özel**.
-4. Her birini sırayla bir sonraki günün 18:00'ine planla. YouTube, bilgisayarın kapalıyken de yayınlar.
+Sadece raporu kontrol etmen yeterli. **Bölümleri artık elle yükleme**, yoksa aynı bölüm iki kez yüklenir.
 
-**YouTube onayı geldikten sonra:** Sadece raporu kontrol etmen yeterli.
+İstersen `Bilgisayari_Guncelle.bat` ile buluttaki son hâli ve yeni videoları bilgisayarına indirebilirsin.
 
 ## Sorun olursa
 

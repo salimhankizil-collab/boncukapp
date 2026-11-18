@@ -38,7 +38,7 @@ REPO = os.environ.get("GITHUB_REPOSITORY", "salimhankizil-collab/boncukapp")
 
 VARSAYILAN = {
     "yayin_saati": "18:00",
-    "denetim_onayli": False,   # YouTube API incelemesi onaylanınca true yap: videolar otomatik yüklenip planlanır
+    "denetim_onayli": False,   # true = otomatik yükleme açık (adı eski; 2 Kas 2026'dan beri API yüklemeleri için denetim gerekmiyor)
     "tampon_gun": 7,           # elde en az bu kadar yüklenmemiş bölüm tutulur
     "gunluk_en_fazla_yukleme": 2,
 }
@@ -163,7 +163,7 @@ def calistir(yukleme_yok=False):
                 log("ÜRETİM HATASI: " + traceback.format_exc())
                 break
         bol = oku(BOLUMLER, {})
-        if BULUT and yeni and not ayar["denetim_onayli"]:
+        if BULUT and yeni:  # bilgisayara indirilebilsin diye her zaman Release olarak da konur
             try:
                 etiket = release_olustur(yeni, bol)
                 for no in yeni:
@@ -279,7 +279,7 @@ def calistir(yukleme_yok=False):
     ozet = {
         "guncelleme": simdi.strftime("%Y-%m-%d %H:%M"),
         "baglanti": "Bağlı" if yt else "Bağlantı yok",
-        "otomatik_yayin": "Açık" if ayar["denetim_onayli"] else "YouTube onayı bekleniyor",
+        "otomatik_yayin": "Açık" if ayar["denetim_onayli"] else "Kapalı (bölümleri elle yükle)",
         "abone": kanal["abone"] if kanal else (gecmis[gunler[-1]]["abone"] if gunler else 0),
         "toplam_izlenme": son_toplam,
         "dun_izlenme": gunluk[-1]["gunluk_izlenme"] if gunluk and gunluk[-1]["gunluk_izlenme"] is not None else 0,

@@ -1,6 +1,6 @@
 {
  "yayin_saati": "18:00",
- "denetim_onayli": false,
+ "denetim_onayli": true,
  "tampon_gun": 7,
  "gunluk_en_fazla_yukleme": 2
 }
