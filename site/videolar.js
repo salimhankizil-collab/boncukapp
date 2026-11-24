@@ -5,6 +5,7 @@
     kule: { ad: 'Renkli kule', oyun: 'oyunlar/kule.html' },
     golge: { ad: 'Gölge bilmecesi', oyun: 'oyunlar/golge.html' },
     hikaye: { ad: 'Boncuk ve Arkadaşları', oyun: 'oyunlar/kelime.html' },
+    film: { ad: "Manas ve Tibet'in Maceraları", oyun: 'index.html#oyunlar' },
   };
   const temizBaslik = (b) => String(b || '').replace(/\s*\|\s*Boncuk.*$/i, '').replace(/#\S+/g, '').trim();
   const tarih = (t) => { try { return new Date(t.replace(' ', 'T') + ':00+03:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }); } catch (e) { return ''; } };
@@ -26,7 +27,7 @@
     const t = document.createElement('span'); t.className = 'soluk'; t.textContent = tarih(v.tarih);
     const ey = document.createElement('div'); ey.className = 'eylem';
     const izle = document.createElement('a'); izle.className = 'dugme'; izle.href = a.href; izle.target = '_blank'; izle.rel = 'noopener'; izle.textContent = '▶ İzle';
-    const oyna = document.createElement('a'); oyna.className = 'dugme turuncu'; oyna.href = (window.KOK || '') + (v.oyun || tur.oyun); oyna.textContent = 'Bu videonun oyunu';
+    const oyna = document.createElement('a'); oyna.className = 'dugme turuncu'; oyna.href = (window.KOK || '') + (v.oyun || tur.oyun); oyna.textContent = v.tur === 'film' ? 'Oyunlara git' : 'Bu videonun oyunu';
     ey.append(izle, oyna);
     ic.append(et, h, t, ey);
     k.append(a, ic);

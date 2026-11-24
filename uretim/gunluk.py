@@ -42,7 +42,7 @@ VARSAYILAN = {
     "tampon_gun": 7,           # elde en az bu kadar yüklenmemiş bölüm tutulur
     "gunluk_en_fazla_yukleme": 2,
 }
-TUR_ADI = {"toplar": "Renkli toplar", "golge": "Gölge bilmecesi", "kule": "Renkli kule", "hikaye": "Boncuk ve Arkadaşları"}
+TUR_ADI = {"toplar": "Renkli toplar", "golge": "Gölge bilmecesi", "kule": "Renkli kule", "hikaye": "Boncuk ve Arkadaşları", "film": "Manas ve Tibet'in Maceraları"}
 
 
 def oku(yol, varsayilan):
@@ -238,7 +238,8 @@ def calistir(yukleme_yok=False):
         no = vid_bol.get(v["id"])
         b = bol.get(str(no)) if no else None
         tur = b["tur"] if b else ("golge" if "Gölgesi" in v["baslik"] else "kule" if "Kule" in v["baslik"]
-                                  else "hikaye" if "Pamuk" in v["baslik"] else "toplar")
+                                  else "hikaye" if "Pamuk" in v["baslik"]
+                                  else "film" if "Manas ve Tibet" in v["baslik"] else "toplar")
         if v["gorunurluk"] == "public":
             durum = "Yayında"
         elif v["gorunurluk"] == "private" and v["plan"]:
@@ -256,7 +257,7 @@ def calistir(yukleme_yok=False):
                                 "izlenme": v["izlenme"], "begeni": v["begeni"], "link": f"https://youtube.com/shorts/{v['id']}"})
         if durum == "Yayında":
             site_videolari.append({"id": v["id"], "bolum": no, "tur": tur, "baslik": v["baslik"], "tarih": tarih,
-                                   "oyun": oyun_linki(b) if b else f"oyunlar/{tur}.html"})
+                                   "oyun": oyun_linki(b) if b else ("index.html#oyunlar" if tur == "film" else f"oyunlar/{tur}.html")})
     video_satirlari.sort(key=lambda r: (r["bolum"] is None, -(r["bolum"] or 0)))
     site_videolari.sort(key=lambda r: r["tarih"], reverse=True)
 
