@@ -22,3 +22,6 @@ site/veri/videolar.json
 
 # Denetim formu kanıt dosyaları (sadece bilgisayarda)
 denetim/
+
+# Filmler: aile isimleri ve görseller içerir, sadece bilgisayarda kalır
+filmler/

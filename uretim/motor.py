@@ -369,7 +369,57 @@ def _mp3_np(path):
     return np.frombuffer(out, dtype=np.float32).copy()
 
 
+def _eleven_anahtar():
+    import os
+    anahtar = os.environ.get("ELEVENLABS_API_KEY")
+    if anahtar:
+        return anahtar.strip()
+    dosya = KOK.parent / "gizli" / "elevenlabs_key.txt"
+    return dosya.read_text(encoding="utf-8").strip()
+
+
+def _eleven_seslendir(metin, ses_id, model, ayar, hedef):
+    """ElevenLabs ile seslendirir (anahtar gizli/elevenlabs_key.txt ya da ELEVENLABS_API_KEY)."""
+    import json
+    import urllib.request
+    govde = {"text": metin, "model_id": model, "language_code": "tr",
+             "voice_settings": {"stability": ayar.get("stability", 0.45), "similarity_boost": ayar.get("benzerlik", 0.8),
+                                "style": ayar.get("stil", 0.35), "use_speaker_boost": True}}
+    if model == "eleven_v3":
+        govde.pop("language_code")
+    istek = urllib.request.Request(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{ses_id}?output_format=mp3_44100_128",
+        data=json.dumps(govde).encode("utf-8"),
+        headers={"xi-api-key": _eleven_anahtar(), "Content-Type": "application/json", "Accept": "audio/mpeg"})
+    with urllib.request.urlopen(istek, timeout=120) as r:
+        hedef.write_bytes(r.read())
+
+
 def seslendir(metin, dil="tr"):
+    if SESLER[dil][0] == "eleven":  # ("eleven", ses_id, model, {ayarlar}, hızlandırma)
+        _, ses_id, model, ayar, *ek = SESLER[dil]
+        hizlandir = ek[0] if ek else 1.0
+        anahtar = hashlib.md5(f"eleven|{ses_id}|{model}|{sorted(ayar.items())}|{metin}".encode()).hexdigest()[:16]
+        yol = ONBELLEK / f"{anahtar}.mp3"
+        if not yol.exists() or yol.stat().st_size < 1000:
+            gecici = yol.with_suffix(".tmp")
+            for deneme in range(4):
+                try:
+                    _eleven_seslendir(metin, ses_id, model, ayar, gecici)
+                    gecici.replace(yol)
+                    break
+                except Exception:  # noqa: BLE001
+                    if deneme == 3:
+                        raise
+                    time.sleep(3 * (deneme + 1))
+        s = _mp3_np(yol)
+        idx = np.where(np.abs(s) > 0.015)[0]
+        if len(idx):
+            s = s[max(0, idx[0] - 600): idx[-1] + 2500]
+        if hizlandir != 1.0:
+            n = int(len(s) / hizlandir)
+            s = np.interp(np.linspace(0, len(s) - 1, n), np.arange(len(s)), s).astype(np.float32)
+        return s
     ses, hiz, perde, *ek = SESLER[dil]
     hizlandir = ek[0] if ek else 1.0  # >1: sesi örnekleyerek hızlandırır ve inceltir (çizgi film sesi, doğal tını korunur)
     anahtar = hashlib.md5(f"{ses}|{hiz}|{perde}|{metin}".encode()).hexdigest()[:16]
